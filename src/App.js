@@ -1,33 +1,32 @@
-import logo from './logo.svg';
 import './App.css';
+// 🔑 Importar Routes y Route
+import { Routes, Route } from 'react-router-dom'; 
+// Asumo que tienes los componentes Header y Footer
 import Header from './Header'; 
 import Footer from './Footer'; 
-import { Routes, Route } from 'react-router-dom';
-import HomeContent from './HomeContent';
+// 🔑 Importar los nuevos componentes
 import Login from './Login';
+import HomeContent from './HomeContent'; 
 
 function App() {
   return (
     <div className="App">
-      <Header /> 
+      
+      <Header />
+      
       <main>
-        <p>
-          En tu TuFitness queremos ayudar a todo tipo de personas a empezar con el deporte, 
-          de una forma sana en la que se compare con ella misma y no con las demas personas.
-          Ya que entre otras muchas funciones de ofrece una estadistica del proceso que se ha 
-          ido teniendo.
-        </p>
-        {/*PREDUNTAR A PABLO SI METER VIDEOS AQUI O METER OTRA COSA*/}
+        {/* 🔑 El Routes decide qué componente mostrar */}
         <Routes>
+          {/* Ruta para la página principal: '/' */}
           <Route path="/" element={<HomeContent />} /> 
+          
+          {/* Ruta para la página de Login: '/iniciar-sesion' */}
           <Route path="/iniciar-sesion" element={<Login />} /> 
         </Routes>
-      
-
       </main>
       
-      <Footer /> 
-
+      <Footer />
+      
     </div>
   );
 }

@@ -15,9 +15,9 @@ function Header() {
       </div>
       
       <nav> 
-        <button className="login-button" onClick={navigateToLogin}>
+        <Link to="/iniciar-sesion" className="login-button">
           Iniciar Sesión
-        </button>
+        </Link>
       </nav>
     </header>
   );

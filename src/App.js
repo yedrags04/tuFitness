@@ -2,6 +2,9 @@ import logo from './logo.svg';
 import './App.css';
 import Header from './Header'; 
 import Footer from './Footer'; 
+import { Routes, Route } from 'react-router-dom';
+import HomeContent from './HomeContent';
+import Login from './Login';
 
 function App() {
   return (
@@ -14,7 +17,13 @@ function App() {
           Ya que entre otras muchas funciones de ofrece una estadistica del proceso que se ha 
           ido teniendo.
         </p>
-        #PREDUNTAR A PABLO SI METER VIDEOS AQUI O METER OTRA COSA
+        {/*PREDUNTAR A PABLO SI METER VIDEOS AQUI O METER OTRA COSA*/}
+        <Routes>
+          <Route path="/" element={<HomeContent />} /> 
+          <Route path="/iniciar-sesion" element={<Login />} /> 
+        </Routes>
+      
+
       </main>
       
       <Footer /> 

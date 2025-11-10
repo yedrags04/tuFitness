@@ -1,8 +1,6 @@
 import React from 'react';
-// Si usas el logo.svg, impórtalo:
-import logo from './logo.svg'; 
 
-function Header() {
+function Login() {
   const navigateToLogin = () => {
     window.location.href = '/Login.js';
   }
@@ -11,12 +9,12 @@ function Header() {
       {/* Grupo Izquierda: Logo y Nombre */}
       <div className="header-left-group">
         <img src={logo} className="App-logo" alt="logo" />
-        <h1>TuFitness</h1>
+        <h1>jhsioff</h1>
       </div>
       
       <nav> 
         <button className="login-button" onClick={navigateToLogin}>
-          Iniciar Sesión
+          IPatata
         </button>
       </nav>
     </header>

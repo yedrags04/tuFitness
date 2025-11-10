@@ -1,30 +1,51 @@
 .App {
-  text-align: center;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.App-main-header .App-logo {
+  height: 40px; 
+  width: 40px;  
+  margin-right: 15px; 
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+
+.App-main-header h1, 
+.App-main-header p {
+    font-size: 1.5em; 
+    margin: 0; 
 }
+
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+}
+
+.App-main-header {
+  position: fixed; 
+  top: 0; 
+  left: 0;
+  width: 100%; 
+  z-index: 1000; 
+  background-color: #282c34; 
+  color: white; 
+  padding: 10px 20px; 
+  
+
+  display: flex;
+  align-items: center; 
+  justify-content: space-between; 
+}
+
+.header-left-group {
+    display: flex;
+    align-items: center;
 }
 
 .App-link {
@@ -46,4 +67,19 @@ footer {
   padding: 10px 0;
   margin-top: auto; /* Esto empuja el footer al final de la página */
   width: 100%;
+}
+
+.login-button {
+    padding: 8px 16px;
+    background-color: #61dafb; /* El color de React, para destacar */
+    color: #282c34;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+main {
+  margin-top: 80px; 
+  padding: 20px;
 }

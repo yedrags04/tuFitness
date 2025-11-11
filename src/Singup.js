@@ -1,53 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Login.css'; 
-import { gsap } from 'gsap';
-import { Draggable } from 'gsap/Draggable';
-import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
-import { Link } from 'react-router-dom';
-gsap.registerPlugin(Draggable, MorphSVGPlugin); // Registrar plugins
+import './Login.css'; // Reutiliza el mismo CSS
+import { gsap } from 'gsap'; 
+import { Link } from 'react-router-dom'; // Para el enlace de "Volver"
 
-
-function Login() {
-  // ----------------------------------------------------
-  // 1. ESTADO Y REFERENCIAS (El modo React)
-  // ----------------------------------------------------
-
-  // Estado para saber si la lámpara está encendida
+function Signup() {
   const [isOn, setIsOn] = useState(false);
 
-  // Referencias a los elementos del DOM que GSAP necesita tocar
   const lampRef = useRef(null);
   const loginFormRef = useRef(null);
   const onRadioRef = useRef(null);
   const offRadioRef = useRef(null);
   const eyeGroupRef = useRef(null);
+  const hitRef = useRef(null); 
   const cordsGroupRef = useRef(null);
   const cordDummyRef = useRef(null);
-  
-  // Referencias para la animación de la cuerda (simplificado)
-  const hitRef = useRef(null); // El área invisible donde se hace clic
 
-  // ----------------------------------------------------
-  // 2. EFECTO DE SINCRONIZACIÓN (Cuando cambia 'isOn')
-  // ----------------------------------------------------
+  // Efecto que se ejecuta cuando 'isOn' cambia (para animar)
   useEffect(() => {
-    // Este efecto se ejecuta cada vez que el estado 'isOn' cambia.
-    
-    // Sincroniza la variable CSS '--on' que usa el CSS para los colores
     document.documentElement.style.setProperty('--on', isOn ? 1 : 0);
 
-    // Muestra u oculta el formulario
     if (loginFormRef.current) {
       loginFormRef.current.classList.toggle('active', isOn);
     }
     
-    // Actualiza los botones de radio (si existen)
     if (onRadioRef.current && offRadioRef.current) {
       onRadioRef.current.checked = isOn;
       offRadioRef.current.checked = !isOn;
     }
 
-    // Cambia el color de la luz (como en el script original)
     if (isOn) {
       const hue = gsap.utils.random(0, 359);
       const glowColor = `hsl(${hue}, 40%, 45%)`;
@@ -60,26 +40,23 @@ function Login() {
       });
     }
 
-    // Animar los ojos
     if (eyeGroupRef.current) {
       gsap.set(eyeGroupRef.current.children, {
         rotate: isOn ? 0 : 180,
       });
     }
 
-  }, [isOn]); // 🔑 Dependencia: se ejecuta cuando 'isOn' cambia
-
+  }, [isOn]);
   
-  // ----------------------------------------------------
-  // 3. EFECTO DE INICIALIZACIÓN (Solo se ejecuta 1 vez)
-  // ----------------------------------------------------
+  // Efecto que se ejecuta solo una vez (para inicializar)
   useEffect(() => {
-    // 🔑 Hacer la lámpara visible (reemplaza el GSAP del script original)
+    document.body.style.backgroundColor = '#121921'; 
+    document.body.style.minHeight = '100vh'; 
+
     if (lampRef.current) {
         lampRef.current.style.display = 'block';
     }
     
-    // Inicializar la rotación de los ojos
     if (eyeGroupRef.current) {
         gsap.set(eyeGroupRef.current.children, {
           rotate: 180,
@@ -88,35 +65,29 @@ function Login() {
         });
     }
     
-    // Lógica de clic (simplificada, sin arrastrar)
-    // Si tuvieras Draggable, aquí configurarías la animación completa.
     const hitArea = hitRef.current;
     
     const pullCord = () => {
-        // AUDIO.CLICK.play(); // (Si quieres añadir audio)
-        setIsOn(prevIsOn => !prevIsOn); // 🔑 Alterna el estado de React
+        setIsOn(prevIsOn => !prevIsOn); 
     };
 
     if (hitArea) {
       hitArea.addEventListener('click', pullCord);
     }
 
-    // 🔑 Limpieza: se ejecuta cuando el componente se "desmonta"
     return () => {
+      document.body.style.backgroundColor = ''; 
+      document.body.style.minHeight = '';
       if (hitArea) {
         hitArea.removeEventListener('click', pullCord);
       }
     };
-  }, []); // 🔑 Array vacío: se ejecuta solo una vez al montar
+  }, []);
 
-  // ----------------------------------------------------
-  // 4. RENDERIZADO (JSX)
-  // ----------------------------------------------------
   return (
-    <div className="login-page"> {/* 🔑 Contenedor con fondo oscuro */}
+    <div className="login-page">
       <div className="container">
 
-        {/* --- Formularios ocultos --- */}
         <form className="radio-controls">
           <input type="radio" id="on" name="status" value="on" ref={onRadioRef} readOnly />
           <label htmlFor="on">On</label>
@@ -124,17 +95,14 @@ function Login() {
           <label htmlFor="off">Off</label>
         </form>
 
-        {/* --- SVG DE LA LÁMPARA (Convertido a JSX) --- */}
+        {/* --- INICIO SVG LÁMPARA --- */}
         <svg
-          ref={lampRef} // 🔑 Referencia para el SVG principal
+          ref={lampRef}
           className="lamp"
           viewBox="0 0 333 484"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* ... (Pega aquí TODO el contenido del SVG: <g>, <path>, <defs>, etc.) ... */}
-          {/* ... (Asegúrate de que 'class' sea 'className', 'for' sea 'htmlFor', y 'stroke-width' sea 'strokeWidth') ... */}
-          
           <g className="lamp__shade shade">
             <ellipse className="shade__opening" cx="165" cy="220" rx="130" ry="20" />
             <ellipse className="shade__opening-shade" cx="165" cy="220" rx="130" ry="20" fill="url(#opening-shade)" />
@@ -194,8 +162,7 @@ function Login() {
             </linearGradient>
             <linearGradient id="post-shading" x1="150" y1="288" x2="180" y2="288" gradientUnits="userSpaceOnUse">
               <stop stopColor="var(--b-1)" />
-              <stop offset="1" stopColor="var(--b-2)" stopOpacity="0"CSS
-              />
+              <stop offset="1" stopColor="var(--b-2)" stopOpacity="0" />
             </linearGradient>
             <linearGradient id="light" x1="165.5" y1="218.5" x2="165.5" y2="483.5" gradientUnits="userSpaceOnUse">
               <stop stopColor="var(--l-1)" stopOpacity=".2" />
@@ -207,7 +174,6 @@ function Login() {
             </linearGradient>
           </defs>
 
-          {/* 🔑 Área de Clic (onClick ahora es manejado por React) */}
           <circle
             ref={hitRef}
             className="lamp__hit"
@@ -218,43 +184,42 @@ function Login() {
             fillOpacity=".1"
           />
         </svg>
+        {/* --- FIN SVG LÁMPARA --- */}
 
-        {/* --- Formulario de Login --- */}
-        <div ref={loginFormRef} className="login-form"> {/* 🔑 Referencia para el formulario */}
-          <h2>Welcome Back</h2>
+        {/* --- Formulario de Registro --- */}
+        <div ref={loginFormRef} className={`login-form ${isOn ? 'active' : ''}`}>
+          
+          <h2>Crear Cuenta</h2>
+          
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                placeholder="Enter your username"
-                required
-              />
+              <label htmlFor="username">Usuario</label>
+              <input type="text" id="username" placeholder="Elige un usuario" required />
             </div>
+            
             <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter your password"
-                required
-              />
+              <label htmlFor="email">Correo Electrónico</label>
+              <input type="email" id="email" placeholder="tu@correo.com" required />
             </div>
-            <button type="submit" className="login-btn">Login</button>
-            <div className="form-footer">
-              <a href="#" className="forgot-link">Forgot Password?</a>
+
+            <div className="form-group">
+              <label htmlFor="password">Contraseña</label>
+              <input type="password" id="password" placeholder="Crea una contraseña" required />
             </div>
+            
+            <button type="submit" className="login-btn">Registrarse</button>
+            
             <div className="form-footer">
-              <Link to="/Singup.js" className="forgot-link">
-                ¿No tienes cuenta? Regístrate
+              <Link to="/Login.js" className="forgot-link">
+                ¿Ya tienes cuenta? Inicia Sesión
               </Link>
             </div>
           </form>
         </div>
+
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Signup;

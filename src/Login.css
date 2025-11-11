@@ -92,6 +92,8 @@
                 background: #121921; /* <-- ¡Aquí está el fondo oscuro! */
                 margin: 0;
                 font-family: system-ui, -apple-system, sans-serif;
+                margin-top: 0 !important;
+                padding: 0 !important;
             }
 
             .container {

@@ -15,7 +15,8 @@ function App() {
       <main>
         <Routes>
           <Route path="/" element={<HomeContent />} /> 
-          <Route path="/iniciar-sesion" element={<Login />} /> 
+          <Route path="/iniciar-sesion" element={<Login />} />
+          <Route path="/registrarse" element={<Singup />} /> 
         </Routes>
       </main>
       

@@ -210,7 +210,7 @@ function Signup() {
             <button type="submit" className="login-btn">Registrarse</button>
             
             <div className="form-footer">
-              <Link to="/Login.js" className="forgot-link">
+              <Link to="/iniciar-sesion" className="forgot-link">
                 ¿Ya tienes cuenta? Inicia Sesión
               </Link>
             </div>

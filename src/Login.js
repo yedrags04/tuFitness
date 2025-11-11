@@ -246,7 +246,7 @@ function Login() {
               <a href="#" className="forgot-link">Forgot Password?</a>
             </div>
             <div className="form-footer">
-              <Link to="/Singup.js" className="forgot-link">
+              <Link to="/registrarse" className="forgot-link">
                 ¿No tienes cuenta? Regístrate
               </Link>
             </div>

@@ -33,22 +33,29 @@ function Rutinas() {
         
 
         <div class = "rutinas_pre">
+            <p>Rutinas predeterminadas</p>
             <div class = "ritinita_pre">
-                <h3>Rutina 3</h3>
-                <h5>Rutina enfocada en <b>HOMBRO</b></h5>
-                <p>5 días a la semana, 3 horas por dia</p>
+                <h3>CULO</h3>
+                <h5>Rutina enfocada en <b>GLUTEO E ISQUIOS</b></h5>
+                <p>5 días a la semana, 2 horas por dia</p>
                 <button>VER</button>
             </div>
             <div class = "ritinita_pre">
-                <h3>Rutina 3</h3>
-                <h5>Rutina enfocada en <b>HOMBRO</b></h5>
-                <p>5 días a la semana, 3 horas por dia</p>
+                <h3>HOMBRO, PECHO, TRICEPS</h3>
+                <h5>Rutina enfocada en <b>HOMBRO, PECHO</b></h5>
+                <p>5 días a la semana, 2 horas por dia</p>
                 <button>VER</button>
             </div>
             <div class = "ritinita_pre">
-                <h3>Rutina 3</h3>
-                <h5>Rutina enfocada en <b>HOMBRO</b></h5>
-                <p>5 días a la semana, 3 horas por dia</p>
+                <h3>ESPALDA, BICEPS</h3>
+                <h5>Rutina enfocada en <b>ESPALDA</b></h5>
+                <p>5 días a la semana, 2 horas por dia</p>
+                <button>VER</button>
+            </div>
+            <div class = "ritinita_pre">
+                <h3>PIERNA</h3>
+                <h5>Rutina enfocada en <b>CUADRICEPS Y GEMELOS</b></h5>
+                <p>5 días a la semana, 2 horas por dia</p>
                 <button>VER</button>
             </div>
         </div>

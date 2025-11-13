@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Login.css'; // Reutiliza el mismo CSS
+import './Login.css'; 
 import { gsap } from 'gsap'; 
-import { Link } from 'react-router-dom'; // Para el enlace de "Volver"
+import { Link } from 'react-router-dom'; 
 
 function Signup() {
   const [isOn, setIsOn] = useState(false);
 
   const toggleLamp = () => {
-    setIsOn(prev => !prev); // Alterna el estado (de true a false, o viceversa)
+    setIsOn(prev => !prev); 
   };
 
   const lampRef = useRef(null);
@@ -19,7 +19,6 @@ function Signup() {
   const cordsGroupRef = useRef(null);
   const cordDummyRef = useRef(null);
 
-  // Efecto que se ejecuta cuando 'isOn' cambia (para animar)
   useEffect(() => {
     document.documentElement.style.setProperty('--on', isOn ? 1 : 0);
 
@@ -52,7 +51,6 @@ function Signup() {
 
   }, [isOn]);
   
-  // Efecto que se ejecuta solo una vez (para inicializar)
   useEffect(() => {
     document.body.style.backgroundColor = '#121921'; 
     document.body.style.minHeight = '100vh'; 
@@ -75,16 +73,10 @@ function Signup() {
         setIsOn(prevIsOn => !prevIsOn); 
     };
 
-    if (hitArea) {
-      hitArea.addEventListener('click', pullCord);
-    }
 
     return () => {
       document.body.style.backgroundColor = ''; 
       document.body.style.minHeight = '';
-      if (hitArea) {
-        hitArea.removeEventListener('click', pullCord);
-      }
     };
   }, []);
 
@@ -99,7 +91,6 @@ function Signup() {
           <label htmlFor="off">Off</label>
         </form>
 
-        {/* --- INICIO SVG LÁMPARA --- */}
         <svg
           ref={lampRef}
           className="lamp"
@@ -180,10 +171,9 @@ function Signup() {
 
           <g 
             ref={hitRef} 
-            onClick={toggleLamp} // El onClick ahora está en el grupo
+            onClick={toggleLamp} 
             style={{ cursor: 'pointer' }}
           >
-            {/* 1. La bolita visible que brilla */}
             <circle
               className="pull-knob"
               cx="124"
@@ -191,7 +181,6 @@ function Signup() {
               r="10" 
               fill="var(--glow-color)" 
             />
-            {/* 2. El área de clic invisible (para que sea más fácil acertar) */}
             <circle
               className="lamp__hit"
               cx="124"
@@ -201,9 +190,7 @@ function Signup() {
             />
           </g>
         </svg>
-        {/* --- FIN SVG LÁMPARA --- */}
 
-        {/* --- Formulario de Registro --- */}
         <div ref={loginFormRef} className={`login-form ${isOn ? 'active' : ''}`}>
           
           <h2>Crear Cuenta</h2>

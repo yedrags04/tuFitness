@@ -192,27 +192,27 @@ function Login() {
         </svg>
 
         <div ref={loginFormRef} className="login-form"> 
-          <h2>Welcome Back</h2>
+          <h2>Bienvenido</h2>
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Usuario</label>
               <input
                 type="text"
                 id="username"
-                placeholder="Enter your username"
+                placeholder="Introduzca su usuario"
                 required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Contraseña</label>
               <input
                 type="password"
                 id="password"
-                placeholder="Enter your password"
+                placeholder="Introduzca su contraseña"
                 required
               />
             </div>
-            <button type="submit" className="login-btn">Login</button>
+            <button type="submit" className="login-btn">Iniciar sesión</button>
             <div className="form-footer">
               
               <Link to="/recuperar-contrasena" className="forgot-link">

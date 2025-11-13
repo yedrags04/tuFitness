@@ -1,17 +1,153 @@
-.mis_rutinas{
-    border: 1px solid black;
-    margin-bottom: 20PX;
+/* src/Rutinas.css */
+
+/* ---------------------------------- */
+/* 1. Contenedor Principal de la Página */
+/* ---------------------------------- */
+.rutinas-page {
+  /* Fondo oscuro (igual que Login) */
+  background-color: #E0FBFC;
+  color: rgb(0, 0, 0);
+  min-height: 100vh; /* Asegura que ocupe toda la altura */
+  
+  /* Relleno para que no choque con el Header fijo */
+  padding-top: 100px; 
+  padding-bottom: 50px;
+
+  /* 🔑 Definimos el color brillante para esta página */
+  /*--glow-color: hsl(280, 60%, 55%);  Un tono morado, puedes cambiarlo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-.rutina_cliente{
-    border: 1px solid black;
-
+/* Título principal de la página */
+.rutinas-page h2 {
+  font-size: 2.2rem;
+  color: #253237;
+  margin-bottom: 2rem;
+  text-align: center;
 }
 
-.rutinas_pre{
-    border: 1px solid black;
+/* ---------------------------------- */
+/* 2. Secciones (Mis Rutinas / Predeterminadas) */
+/* ---------------------------------- */
+.mis_rutinas,
+.rutinas_pre {
+  width: 90%;
+  max-width: 1200px; /* Ancho máximo para el contenido */
+  margin-bottom: 3rem;
+
+  /* 🔑 Usamos Grid para las tarjetas */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-.ritinita_pre{
-    border: 1px solid black;
+/* Títulos de las secciones ("Mis Rutinas", "Rutinas predeterminadas") */
+.mis_rutinas > p,
+.rutinas_pre > p {
+  /* 🔑 Hacemos que el título ocupe todas las columnas del Grid */
+  grid-column: 1 / -1;
+  
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #253237;
+  margin: 0 0 1rem 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid black;
+}
+
+/* ---------------------------------- */
+/* 3. Tarjetas de Rutina */
+/* ---------------------------------- */
+.rutina_cliente,
+.ritinita_pre { /* ❗️ Usamos "ritinita_pre" por la errata en tu JSX */
+  background: #9DB4C0;
+  padding: 1.5rem;
+  border-radius: 15px;
+  
+  /* 🔑 El efecto de "caja brillante" */
+  border: 2px solid rgb(79, 80, 81);
+  
+  /* Transición para un efecto 'hover' suave */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rutina_cliente:hover,
+.ritinita_pre:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 0 25px rgba(0,0,0,0.3),
+    inset 0 0 10px rgba(0,0,0,0.1),
+    0 0 35px black;
+}
+
+/* Contenido de las tarjetas */
+.rutina_cliente h3,
+.ritinita_pre h3 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+  color: #253237;
+}
+
+.rutina_cliente h5,
+.ritinita_pre h5 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #253237;
+  margin: 0 0 1rem 0;
+}
+
+.rutina_cliente h5 b,
+.ritinita_pre h5 b {
+  color: #253237; /* Un color de acento para el enfoque */
+  font-weight: 600;
+  text-shadow: 0 0 2px blue;
+}
+
+.rutina_cliente p,
+.ritinita_pre p {
+  font-size: 0.9rem;
+  color: #253237;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------------------------------- */
+/* 4. Botones de las Tarjetas */
+/* ---------------------------------- */
+.rutina_cliente button,
+.ritinita_pre button {
+  /* 🔑 Reutilizamos el estilo de botón brillante */
+  padding: 10px 20px;
+  background: linear-gradient(
+    135deg,
+    #253237,
+    hsl(207, 40%, 35%) /* Versión oscura del glow */
+  );
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 10px; /* Espacio entre botones */
+}
+
+.rutina_cliente button:hover,
+.ritinita_pre button:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilo para el botón "EDITAR" (secundario) */
+.rutina_cliente button:nth-of-type(2) {
+  background: rgba(255, 255, 255, 0.1); /* Fondo grisáceo */
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.rutina_cliente button:nth-of-type(2):hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #253237;
+  color: #253237;
+  box-shadow: none; /* Quitamos el brillo */
 }

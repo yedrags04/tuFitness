@@ -287,3 +287,33 @@
             .top__body {
                 fill: var(--t-3);
             }
+
+            .pull-knob {
+  /* Usamos filter: drop-shadow para un brillo limpio en SVG */
+  filter: drop-shadow(0 0 5px var(--glow-color));
+  transition: filter 0.3s ease;
+  
+  /* Animación de pulso */
+  animation: pulse 2s infinite;
+}
+
+/* Animación de pulso (brillo intermitente) */
+@keyframes pulse {
+  0% {
+    filter: drop-shadow(0 0 5px var(--glow-color));
+  }
+  50% {
+    /* Brillo más intenso a mitad de la animación */
+    filter: drop-shadow(0 0 15px var(--glow-color)); 
+  }
+  100% {
+    filter: drop-shadow(0 0 5px var(--glow-color));
+  }
+}
+
+/* Cuando la lámpara está apagada (la variable --on es 0) */
+:root[style*="--on: 0"] .pull-knob {
+  fill: #666; /* Color gris apagado */
+  animation: none; /* Detener la animación de pulso */
+  filter: none; /* Quitar el brillo */
+}

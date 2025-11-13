@@ -6,6 +6,10 @@ import { Link } from 'react-router-dom'; // Para el enlace de "Volver"
 function Signup() {
   const [isOn, setIsOn] = useState(false);
 
+  const toggleLamp = () => {
+    setIsOn(prev => !prev); // Alterna el estado (de true a false, o viceversa)
+  };
+
   const lampRef = useRef(null);
   const loginFormRef = useRef(null);
   const onRadioRef = useRef(null);
@@ -174,15 +178,28 @@ function Signup() {
             </linearGradient>
           </defs>
 
-          <circle
-            ref={hitRef}
-            className="lamp__hit"
-            cx="124"
-            cy="347"
-            r="66"
-            fill="#C4C4C4"
-            fillOpacity=".1"
-          />
+          <g 
+            ref={hitRef} 
+            onClick={toggleLamp} // El onClick ahora está en el grupo
+            style={{ cursor: 'pointer' }}
+          >
+            {/* 1. La bolita visible que brilla */}
+            <circle
+              className="pull-knob"
+              cx="124"
+              cy="347"
+              r="10" 
+              fill="var(--glow-color)" 
+            />
+            {/* 2. El área de clic invisible (para que sea más fácil acertar) */}
+            <circle
+              className="lamp__hit"
+              cx="124"
+              cy="347"
+              r="66"
+              fill="transparent"
+            />
+          </g>
         </svg>
         {/* --- FIN SVG LÁMPARA --- */}
 

@@ -14,6 +14,9 @@ function Login() {
 
   // Estado para saber si la lámpara está encendida
   const [isOn, setIsOn] = useState(false);
+  const toggleLamp = () => {
+    setIsOn(prev => !prev); // Alterna el estado (de true a false, o viceversa)
+  };
 
   // Referencias a los elementos del DOM que GSAP necesita tocar
   const lampRef = useRef(null);
@@ -208,15 +211,28 @@ function Login() {
           </defs>
 
           {/* 🔑 Área de Clic (onClick ahora es manejado por React) */}
-          <circle
-            ref={hitRef}
-            className="lamp__hit"
-            cx="124"
-            cy="347"
-            r="66"
-            fill="#C4C4C4"
-            fillOpacity=".1"
-          />
+          <g 
+            ref={hitRef} 
+            onClick={toggleLamp} // El onClick ahora está en el grupo
+            style={{ cursor: 'pointer' }}
+          >
+            {/* 1. La bolita visible que brilla */}
+            <circle
+              className="pull-knob"
+              cx="124"
+              cy="347"
+              r="10" 
+              fill="var(--glow-color)" 
+            />
+            {/* 2. El área de clic invisible (para que sea más fácil acertar) */}
+            <circle
+              className="lamp__hit"
+              cx="124"
+              cy="347"
+              r="66"
+              fill="transparent"
+            />
+          </g>
         </svg>
 
         {/* --- Formulario de Login --- */}
@@ -243,7 +259,10 @@ function Login() {
             </div>
             <button type="submit" className="login-btn">Login</button>
             <div className="form-footer">
-              <a href="#" className="forgot-link">Forgot Password?</a>
+              {/* Cambiamos <a> por <Link> y "href" por "to" */}
+              <Link to="/recuperar-contrasena" className="forgot-link">
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
             <div className="form-footer">
               <Link to="/registrarse" className="forgot-link">

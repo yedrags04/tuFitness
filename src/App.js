@@ -5,6 +5,7 @@ import Footer from './Footer';
 import Login from './Login';
 import Singup from './Singup';
 import HomeContent from './HomeContent'; 
+import Rutinas from './Rutinas';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<HomeContent />} /> 
           <Route path="/iniciar-sesion" element={<Login />} />
           <Route path="/registrarse" element={<Singup />} /> 
+          <Route path="/rutinas" element={<Rutinas />} />
         </Routes>
       </main>
       

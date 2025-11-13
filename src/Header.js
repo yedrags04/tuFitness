@@ -34,7 +34,7 @@ function Header() {
             <Link to="/" className="dropdown-link" onClick={closeMenu}>
               Inicio
             </Link>
-            <Link to="/Rutinas.js" className="dropdown-link" onClick={closeMenu}>
+            <Link to="/rutinas" className="dropdown-link" onClick={closeMenu}>
               Rutinas
             </Link>
             <Link to="/registrarse" className="dropdown-link" onClick={closeMenu}>

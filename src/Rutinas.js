@@ -1,25 +1,13 @@
 import React from 'react';
-import logo from './logo192.png'; 
-import { Link } from 'react-router-dom';
+import './Rutinas.css';
 
-function Header() {
+function Rutinas() {
   return (
-    <header className="App-main-header">
-      
-      <div className="header-left-group">
-        <Link to="/">
-          <img src={logo} className="App-logo" alt="logo" />
-        </Link>
-        <h1>TuFitness</h1>
-      </div>
-      
-      <nav>
-        <Link to="/iniciar-sesion" className="login-button">
-          INICIAR SESIÓN
-        </Link>
-      </nav>
-    </header>
+    <div>
+      <h2>Aqui encontraras todas tus rutinas y rutinas predeteminadas</h2>
+
+    </div>
   );
 }
 
-export default Header;
+export default Rutinas;

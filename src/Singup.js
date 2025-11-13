@@ -66,14 +66,7 @@ function Signup() {
           yPercent: 50,
         });
     }
-    
-    const hitArea = hitRef.current;
-    
-    const pullCord = () => {
-        setIsOn(prevIsOn => !prevIsOn); 
-    };
-
-
+   
     return () => {
       document.body.style.backgroundColor = ''; 
       document.body.style.minHeight = '';

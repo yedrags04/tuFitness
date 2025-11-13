@@ -70,13 +70,7 @@ function Login() {
           transformOrigin: "50% 50%",
           yPercent: 50,
         });
-    }
-    
-    const hitArea = hitRef.current;
-    
-    const pullCord = () => {
-        setIsOn(prevIsOn => !prevIsOn); 
-    };
+    } 
 
     return () => {
     };

@@ -1,4 +1,4 @@
-import './App.css';
+import './css/App.css';
 import { Routes, Route } from 'react-router-dom'; 
 import Header from './Header'; 
 import Footer from './Footer'; 
@@ -6,6 +6,7 @@ import Login from './Login';
 import Singup from './Singup';
 import HomeContent from './HomeContent'; 
 import Rutinas from './Rutinas';
+import EditarRutina from './EditarRutina'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/iniciar-sesion" element={<Login />} />
           <Route path="/registrarse" element={<Singup />} /> 
           <Route path="/rutinas" element={<Rutinas />} />
+          <Route path="/EditarRutina" element={<EditarRutina />} />
         </Routes>
       </main>
       

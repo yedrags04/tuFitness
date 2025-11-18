@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import logo from './logo192.png'; 
+import logo from './img/logo192.png'; 
 import { Link } from 'react-router-dom';
 
 function Header() {

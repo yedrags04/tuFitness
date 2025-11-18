@@ -1,5 +1,6 @@
 import React from 'react';
-import './Rutinas.css';
+import './css/Rutinas.css';
+import { Link } from 'react-router-dom';
 
 function Rutinas() {
   return (
@@ -13,21 +14,27 @@ function Rutinas() {
                 <h5>Rutina enfocada en <b>CULO</b></h5>
                 <p>3 días a la semana, 2 horas por día</p>
                 <button>VER</button>
-                <button>EDITAR</button>
+                <Link to="/EditarRutina" className="Editar">
+                    EDITAR
+                </Link>
             </div>
             <div className="rutina_cliente">
                 <h3>Rutina 2</h3>
                 <h5>Rutina enfocada en <b>ESPALDA</b></h5>
                 <p>4 días a la semana, 1 horas por día</p>
                 <button>VER</button>
-                <button>EDITAR</button>
+                <Link to="/EditarRutina" className="Editar">
+                    EDITAR
+                </Link>
             </div>
             <div className="rutina_cliente">
                 <h3>Rutina 3</h3>
                 <h5>Rutina enfocada en <b>HOMBRO</b></h5>
                 <p>5 días a la semana, 3 horas por día</p>
                 <button>VER</button>
-                <button>EDITAR</button>
+                <Link to="/EditarRutina" className="Editar">
+                    EDITAR
+                </Link>
             </div>
         </div>
 

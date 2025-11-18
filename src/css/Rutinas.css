@@ -139,15 +139,24 @@
   transform: translateY(-2px);
 }
 
-/* Estilo para el botón "EDITAR" (secundario) */
-.rutina_cliente button:nth-of-type(2) {
-  background: rgba(255, 255, 255, 0.1); /* Fondo grisáceo */
+
+.Editar {
+  /* 🔑 Estilos copiados de tu botón secundario */
+  display: inline-block; /* Para que respete el padding */
+  padding: 7px 15px;
+  background: rgba(255, 255, 255, 0.1); 
   border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #fff; /* Color del texto */
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none; /* Quitar subrayado del enlace */
 }
 
-.rutina_cliente button:nth-of-type(2):hover {
+.Editar:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: #253237;
   color: #253237;
-  box-shadow: none; /* Quitamos el brillo */
 }

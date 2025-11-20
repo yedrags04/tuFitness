@@ -20,15 +20,18 @@ const verifyToken = (req, res, next) => {
 // OBTENER TODAS LAS RUTINAS (Propias + Predeterminadas)
 router.get('/', verifyToken, async (req, res) => {
   try {
+    // MODIFICACION: Buscar por el ID del usuario O si es default
     const routines = await Routine.find({
       $or: [
-        { user: req.user.id }, // Rutinas creadas por el usuario actual
-        { isDefault: true }    // Rutinas del sistema
+        { user: req.user.id }, // Rutinas del usuario
+        { isDefault: true }    // Rutinas predeterminadas
       ]
-    });
-    res.status(200).json(routines);
+    }).sort({ date: -1 });
+
+    res.json(routines);
   } catch (err) {
-    res.status(500).json(err);
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 });
 

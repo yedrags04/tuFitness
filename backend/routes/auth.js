@@ -27,13 +27,21 @@ router.post('/register', async (req, res) => {
 // LOGIN
 router.post('/login', async (req, res) => {
   try {
-    const user = await User.findOne({ username: req.body.username }); // Buscamos por usuario
-    if (!user) return res.status(404).json("Usuario no encontrado");
+    // 1. BUSCAR USUARIO por el campo 'username' que envía el frontend
+    const user = await User.findOne({ username: req.body.username }); // <-- SOLUCIÓN AQUÍ
+    
+    // Si no encuentra el usuario
+    if (!user) {
+        return res.status(404).json("Usuario no encontrado");
+    }
 
+    // 2. Comparar contraseña
     const validPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!validPassword) return res.status(400).json("Contraseña incorrecta");
+    if (!validPassword) {
+        return res.status(400).json("Contraseña incorrecta");
+    }
 
-    // Crear Token de sesión (JWT)
+    // 3. Generar Token (JWT)
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
     
     // Devolver usuario (sin contraseña) y token

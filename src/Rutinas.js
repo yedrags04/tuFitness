@@ -1,73 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './css/Rutinas.css';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 function Rutinas() {
+  const [rutinas, setRutinas] = useState([]);
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchRutinas = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/routines", {
+          headers: { token: `Bearer ${token}` } // Enviamos el token para permiso
+        });
+        setRutinas(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchRutinas();
+  }, [token]);
+
   return (
-    
     <div className="rutinas-page">
-        <h2>Aquí encontrarás todas tus rutinas y rutinas predeterminadas</h2>
-        <div className="mis_rutinas">
-            <p>Mis Rutinas</p>
-            <div className="rutina_cliente">
-                <h3>Rutina 1</h3>
-                <h5>Rutina enfocada en <b>CULO</b></h5>
-                <p>3 días a la semana, 2 horas por día</p>
-                <button>VER</button>
-                <Link to="/EditarRutina" className="Editar">
-                    EDITAR
-                </Link>
-            </div>
-            <div className="rutina_cliente">
-                <h3>Rutina 2</h3>
-                <h5>Rutina enfocada en <b>ESPALDA</b></h5>
-                <p>4 días a la semana, 1 horas por día</p>
-                <button>VER</button>
-                <Link to="/EditarRutina" className="Editar">
-                    EDITAR
-                </Link>
-            </div>
-            <div className="rutina_cliente">
-                <h3>Rutina 3</h3>
-                <h5>Rutina enfocada en <b>HOMBRO</b></h5>
-                <p>5 días a la semana, 3 horas por día</p>
-                <button>VER</button>
-                <Link to="/EditarRutina" className="Editar">
-                    EDITAR
-                </Link>
-            </div>
-        </div>
-
+        <h2>Hola {user.username}, aquí están tus rutinas</h2>
         
-
-        <div className="rutinas_pre">
-            <p>Rutinas predeterminadas</p>
-            <div className="ritinita_pre">
-                <h3>CULO</h3>
-                <h5>Rutina enfocada en <b>GLUTEO E ISQUIOS</b></h5>
-                <p>5 días a la semana, 2 horas por día</p>
-                <button>VER</button>
-            </div>
-            <div className="ritinita_pre">
-                <h3>HOMBRO, PECHO, TRICEPS</h3>
-                <h5>Rutina enfocada en <b>HOMBRO, PECHO</b></h5>
-                <p>5 días a la semana, 2 horas por día</p>
-                <button>VER</button>
-            </div>
-            <div className="ritinita_pre">
-                <h3>ESPALDA, BÍCEPS</h3>
-                <h5>Rutina enfocada en <b>ESPALDA</b></h5>
-                <p>5 días a la semana, 2 horas por día</p>
-                <button>VER</button>
-            </div>
-            <div className="ritinita_pre">
-                <h3>PIERNA</h3>
-                <h5>Rutina enfocada en <b>CUÁDRICEPS Y GEMELOS</b></h5>
-                <p>5 días a la semana, 2 horas por día</p>
-                <button>VER</button>
-            </div>
+        <div className="mis_rutinas">
+            <p>Mis Rutinas y Predeterminadas</p>
+            {rutinas.map((rutina) => (
+                <div className={rutina.isDefault ? "ritinita_pre" : "rutina_cliente"} key={rutina._id}>
+                    <h3>{rutina.name}</h3>
+                    <h5>Enfoque: <b>{rutina.focus}</b></h5>
+                    <p>{rutina.daysPerWeek} días/sem, {rutina.duration}h</p>
+                    <button>VER</button>
+                    {/* Solo mostrar botón editar si NO es predeterminada */}
+                    {!rutina.isDefault && (
+                        <Link to={`/EditarRutina?id=${rutina._id}`} className="Editar">
+                            EDITAR
+                        </Link>
+                    )}
+                </div>
+            ))}
         </div>
-
     </div>
   );
 }

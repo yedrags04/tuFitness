@@ -136,3 +136,29 @@ main {
 .dropdown-link:hover {
   background-color: #444;
 }
+
+.btn-logout {
+  background-color: #dc3545; /* Rojo */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.btn-logout:hover {
+  background-color: #c82333;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-msg {
+  color: white; /* O el color que use tu tema */
+  font-size: 0.9rem;
+}

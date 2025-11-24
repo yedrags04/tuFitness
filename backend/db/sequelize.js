@@ -13,7 +13,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false,
-    // CLAVE PARA RAILWAY/RENDER: La mayoría de los servicios cloud usan SSL
+    // ESTE BLOQUE SSL ES CRUCIAL PARA LA CONEXIÓN EN RAILWAY
     dialectOptions: {
         ssl: {
             rejectUnauthorized: true, 
@@ -23,39 +23,32 @@ const sequelize = new Sequelize(
 );
 
 // --- 2. DEFINICIÓN DE MODELOS (Tablas) ---
-const User = sequelize.define('User', {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  username: { type: DataTypes.STRING, unique: true, allowNull: false },
-  email: { type: DataTypes.STRING, unique: true, allowNull: false },
-  password: { type: DataTypes.STRING, allowNull: false }
-}, { freezeTableName: true });
-
-const Routine = sequelize.define('Routine', {
+const User = sequelize.define('User', { /* ... Definición de columnas ... */ }, { freezeTableName: true });
+const Routine = sequelize.define('Routine', { 
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   name: { type: DataTypes.STRING, allowNull: false },
   focus: DataTypes.STRING,
-  isDefault: { type: DataTypes.BOOLEAN, defaultValue: false } // Para rutinas predeterminadas
+  isDefault: { type: DataTypes.BOOLEAN, defaultValue: false } 
 }, { freezeTableName: true });
 
-const Exercise = sequelize.define('Exercise', {
+const Exercise = sequelize.define('Exercise', { 
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   name: { type: DataTypes.STRING, allowNull: false },
   sets: { type: DataTypes.INTEGER, allowNull: false },
   reps: { type: DataTypes.INTEGER, allowNull: false }
 }, { freezeTableName: true });
 
-// --- 3. RELACIONES (Asociaciones) ---
+// --- 3. RELACIONES ---
 User.hasMany(Routine); 
 Routine.belongsTo(User); 
 Routine.hasMany(Exercise); 
 Exercise.belongsTo(Routine);
 
-// Función para conectar y sincronizar las tablas
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
         console.log('✅ Conexión a la DB SQL exitosa.');
-        await sequelize.sync(); // Crea las tablas si no existen
+        await sequelize.sync(); // Sincroniza y crea/actualiza las tablas en la DB
     } catch (error) {
         console.error('❌ Fallo al conectar o sincronizar con la DB SQL:', error);
     }

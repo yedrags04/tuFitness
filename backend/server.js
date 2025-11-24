@@ -9,10 +9,9 @@ const routineRoute = require('./routes/routines');
 dotenv.config();
 const app = express();
 
-// Iniciar la conexión a la base de datos (utilizando las credenciales de la nube)
+// Iniciar la conexión a la base de datos
 connectDB(); 
 
-// Middlewares
 app.use(cors());
 app.use(express.json()); 
 

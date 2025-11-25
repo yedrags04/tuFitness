@@ -4,26 +4,36 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// 1. CONEXIÓN A MySQL usando las variables de entorno
+// 1. CONEXIÓN A MySQL (Compatible con Railway)
 const sequelize = new Sequelize(
   process.env.DB_NAME, 
   process.env.DB_USER, 
   process.env.DB_PASSWORD, 
   {
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 42311, // Railway suele usar puertos aleatorios
     dialect: 'mysql',
     logging: false,
-    // ESTE BLOQUE SSL ES CRUCIAL PARA LA CONEXIÓN EN RAILWAY
     dialectOptions: {
+        // Configuración SSL necesaria para la nube (Railway)
         ssl: {
-            rejectUnauthorized: true, 
+            require: true,
+            rejectUnauthorized: false // Importante para evitar errores de certificados autofirmados en desarrollo
         }
     }
   }
 );
 
-// --- 2. DEFINICIÓN DE MODELOS (Tablas) ---
-const User = sequelize.define('User', { /* ... Definición de columnas ... */ }, { freezeTableName: true });
+// --- 2. DEFINICIÓN DE MODELOS ---
+
+// AQUI ESTABA EL ERROR: Definimos las columnas reales para el Usuario
+const User = sequelize.define('User', { 
+  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  username: { type: DataTypes.STRING, allowNull: false, unique: true },
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: { type: DataTypes.STRING, allowNull: false } // Aquí se guardará el hash
+}, { freezeTableName: true });
+
 const Routine = sequelize.define('Routine', { 
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   name: { type: DataTypes.STRING, allowNull: false },
@@ -47,10 +57,12 @@ Exercise.belongsTo(Routine);
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('✅ Conexión a la DB SQL exitosa.');
-        await sequelize.sync(); // Sincroniza y crea/actualiza las tablas en la DB
+        console.log('✅ Conexión a Railway MySQL exitosa.');
+        // alter: true ajusta las tablas si cambias columnas sin borrar datos
+        await sequelize.sync({ alter: true }); 
+        console.log('✅ Modelos sincronizados.');
     } catch (error) {
-        console.error('❌ Fallo al conectar o sincronizar con la DB SQL:', error);
+        console.error('❌ Error conectando a Railway:', error);
     }
 };
 

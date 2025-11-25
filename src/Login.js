@@ -28,7 +28,7 @@ function Login() {
     setError(false);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", credentials);
+      const res = await axios.post("http://localhost:42311/api/auth/login", credentials);
       
       // --- CORRECCIÓN AQUÍ ---
       // Tu backend envía un objeto que contiene "user" y "token" por separado.

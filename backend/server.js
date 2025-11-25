@@ -19,7 +19,7 @@ app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/routines", routineRoute);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 42311;
 
 app.listen(PORT, () => {
   console.log(`Servidor backend corriendo en puerto ${PORT}`);

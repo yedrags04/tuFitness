@@ -1,57 +1,55 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './css/Login.css'; 
 import { gsap } from 'gsap'; 
-import { Link, useNavigate } from 'react-router-dom'; // IMPORTANTE: Agregamos useNavigate
-import axios from 'axios'; // IMPORTANTE: Agregamos axios
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-// Asegúrate de registrar los plugins GSAP si los usas
-import { Draggable } from 'gsap/Draggable';
-import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
-gsap.registerPlugin(Draggable, MorphSVGPlugin); 
 
 function Signup() {
   const [isOn, setIsOn] = useState(false);
-  const navigate = useNavigate(); // Hook para la navegación
+  const navigate = useNavigate();
   
-  // 1. ESTADO PARA LOS DATOS DEL FORMULARIO
+  // Estado para los datos
   const [formData, setFormData] = useState({ 
     username: '', 
     email: '', 
     password: '' 
   });
-  const [error, setError] = useState(false); // Para manejar errores de registro
+  
+  // Estado para el mensaje de error (string en lugar de boolean para ser más específico)
+  const [errorMsg, setErrorMsg] = useState(""); 
 
-  // Función para manejar cambios en los inputs
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // 2. FUNCIÓN DE ENVÍO QUE HABLA CON LA API
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(false);
+    setErrorMsg(""); // Limpiar errores previos
     
     try {
-      // Llamada a TU API (POST)
+      // Llamada a la API
       const res = await axios.post("http://localhost:5000/api/auth/register", formData);
       
-      // Si el registro es exitoso (código 200), redirige al login
-      if (res.data) {
+      // Verificamos el código de estado 201 (Created)
+      if (res.status === 201) {
         alert("¡Cuenta creada con éxito! Por favor, inicia sesión.");
+        // Asegúrate de que esta ruta coincida con la que definiste para el Login en App.js (ej: "/" o "/iniciar-sesion")
         navigate("/iniciar-sesion"); 
       }
     } catch (err) {
-      setError(true);
-      // Muestra un error si el usuario/email ya existe o hay un problema de servidor
-      alert("Error al registrar: El usuario o correo ya existen, o el servidor falló.");
-      console.error(err);
+      console.error("Error de registro:", err);
+      
+      // Capturamos el mensaje exacto que envía tu backend/routes/auth.js
+      if (err.response && err.response.data && err.response.data.msg) {
+        setErrorMsg(err.response.data.msg); // Ej: "El nombre de usuario o email ya están en uso."
+      } else {
+        setErrorMsg("Error al conectar con el servidor. Inténtalo más tarde.");
+      }
     }
   };
 
-  // --- Lógica GSAP/UI (Mantenemos tu código original) ---
-  const toggleLamp = () => {
-    setIsOn(prev => !prev); 
-  };
+  // --- Lógica GSAP/UI (Lámpara) ---
   const lampRef = useRef(null);
   const loginFormRef = useRef(null);
   const onRadioRef = useRef(null);
@@ -61,30 +59,29 @@ function Signup() {
   const cordsGroupRef = useRef(null);
   const cordDummyRef = useRef(null);
 
+  const toggleLamp = () => {
+    setIsOn(prev => !prev); 
+  };
+
   useEffect(() => {
     document.documentElement.style.setProperty('--on', isOn ? 1 : 0);
-
     if (loginFormRef.current) {
       loginFormRef.current.classList.toggle('active', isOn);
     }
-    
     if (onRadioRef.current && offRadioRef.current) {
       onRadioRef.current.checked = isOn;
       offRadioRef.current.checked = !isOn;
     }
-
     if (isOn) {
       const hue = gsap.utils.random(0, 359);
       const glowColor = `hsl(${hue}, 40%, 45%)`;
       const glowColorDark = `hsl(${hue}, 40%, 35%)`;
-      
       gsap.set(document.documentElement, {
         '--shade-hue': hue,
         '--glow-color': glowColor,
         '--glow-color-dark': glowColorDark,
       });
     }
-
     if (eyeGroupRef.current) {
       gsap.set(eyeGroupRef.current.children, {
         rotate: isOn ? 0 : 180,
@@ -95,11 +92,7 @@ function Signup() {
   useEffect(() => {
     document.body.style.backgroundColor = '#121921'; 
     document.body.style.minHeight = '100vh'; 
-
-    if (lampRef.current) {
-        lampRef.current.style.display = 'block';
-    }
-    
+    if (lampRef.current) lampRef.current.style.display = 'block';
     if (eyeGroupRef.current) {
         gsap.set(eyeGroupRef.current.children, {
           rotate: 180,
@@ -107,7 +100,6 @@ function Signup() {
           yPercent: 50,
         });
     }
-   
     return () => {
       document.body.style.backgroundColor = ''; 
       document.body.style.minHeight = '';
@@ -115,22 +107,11 @@ function Signup() {
   }, []);
   // --- FIN Lógica GSAP/UI ---
 
-
   return (
     <div className="login-page">
       <div className="container">
-        
-        {/* ... Código SVG/Lámpara (sin cambios) ... */}
-        {/* ... */}
-        {/* ... */}
-        <svg
-          ref={lampRef}
-          className="lamp"
-          viewBox="0 0 333 484"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* ... Contenido del SVG ... */}
+        {/* Lámpara SVG */}
+        <svg ref={lampRef} className="lamp" viewBox="0 0 333 484" fill="none" xmlns="http://www.w3.org/2000/svg">
            <g className="lamp__shade shade">
             <ellipse className="shade__opening" cx="165" cy="220" rx="130" ry="20" />
             <ellipse className="shade__opening-shade" cx="165" cy="220" rx="130" ry="20" fill="url(#opening-shade)" />
@@ -174,60 +155,57 @@ function Signup() {
               <path className="lamp__eye lamp__stroke" d="M241 135c0-5.523-5.82-10-13-10s-13 4.477-13 10" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
             </g>
           </g>
-          
           <defs>{/* ... definiciones ... */}</defs>
-
-          <g 
-            ref={hitRef} 
-            onClick={toggleLamp} 
-            style={{ cursor: 'pointer' }}
-          >
-            <circle
-              className="pull-knob"
-              cx="124"
-              cy="347"
-              r="10" 
-              fill="var(--glow-color)" 
-            />
-            <circle
-              className="lamp__hit"
-              cx="124"
-              cy="347"
-              r="66"
-              fill="transparent"
-            />
+          <g ref={hitRef} onClick={toggleLamp} style={{ cursor: 'pointer' }}>
+            <circle className="pull-knob" cx="124" cy="347" r="10" fill="var(--glow-color)" />
+            <circle className="lamp__hit" cx="124" cy="347" r="66" fill="transparent" />
           </g>
         </svg>
-
 
         <div ref={loginFormRef} className={`login-form ${isOn ? 'active' : ''}`}>
           <h2>Crear Cuenta</h2>
           
-          {/* 3. ASIGNAMOS EL MANEJADOR DE ENVÍO */}
           <form onSubmit={handleSubmit}> 
             <div className="form-group">
               <label htmlFor="username">Usuario</label>
-              {/* 4. CONECTAMOS EL ESTADO */}
-              <input type="text" id="username" placeholder="Elige un usuario" onChange={handleChange} required />
+              <input
+                type="text"
+                id="username"
+                placeholder="Elige un usuario"
+                onChange={handleChange}
+                required
+              />
             </div>
             
             <div className="form-group">
               <label htmlFor="email">Correo Electrónico</label>
-               {/* 4. CONECTAMOS EL ESTADO */}
-              <input type="email" id="email" placeholder="tu@correo.com" onChange={handleChange} required />
+              <input
+                type="email"
+                id="email"
+                placeholder="tu@correo.com"
+                onChange={handleChange}
+                required
+              />
             </div>
 
             <div className="form-group">
               <label htmlFor="password">Contraseña</label>
-               {/* 4. CONECTAMOS EL ESTADO */}
-              <input type="password" id="password" placeholder="Crea una contraseña" onChange={handleChange} required />
+              <input
+                type="password"
+                id="password"
+                placeholder="Crea una contraseña"
+                onChange={handleChange}
+                required
+              />
             </div>
             
             <button type="submit" className="login-btn">Registrarse</button>
             
-            {error && <p style={{color: 'red', marginTop: '10px'}}>Error en el registro. Inténtalo de nuevo.</p>}
+            {/* Mostramos el mensaje de error específico si existe */}
+            {errorMsg && <p style={{color: 'red', marginTop: '10px'}}>{errorMsg}</p>}
 
             <div className="form-footer">
+              {/* Asegúrate de que la ruta a Login es /iniciar-sesion o la que uses en App.js */}
               <Link to="/iniciar-sesion" className="forgot-link">
                 ¿Ya tienes cuenta? Inicia Sesión
               </Link>

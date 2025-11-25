@@ -28,19 +28,20 @@ function Login() {
     setError(false);
 
     try {
-      // 1. Envía las credenciales al endpoint de Login de tu API
       const res = await axios.post("http://localhost:5000/api/auth/login", credentials);
       
-      // 2. Si es exitoso, guarda los datos del usuario y el token en el navegador
-      const { token, password, ...userData } = res.data;
-      localStorage.setItem("user", JSON.stringify(userData));
+      // --- CORRECCIÓN AQUÍ ---
+      // Tu backend envía un objeto que contiene "user" y "token" por separado.
+      const { user, token } = res.data; 
+      
+      // Guardamos el objeto user limpio y el token
+      localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token); 
       
-      // 3. Redirige a la página principal de rutinas (ruta protegida)
+      // 3. Redirige a la página principal
       window.location.replace("/rutinas"); 
 
     } catch (err) {
-      // Maneja errores de credenciales inválidas (400 o 404)
       setError(true);
       console.error("Error de Login:", err);
     }

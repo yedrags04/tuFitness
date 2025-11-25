@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Importamos Naviga
 import Header from './Header'; 
 import Footer from './Footer'; 
 import Login from './Login';
-import Singup from './Singup';
+import Signup from './Signup';
 import HomeContent from './HomeContent'; 
 import Rutinas from './Rutinas';
 import EditarRutina from './EditarRutina'
@@ -22,7 +22,7 @@ function App() {
           
           {/* Si ya hay usuario, redirige a Rutinas, si no, muestra Login */}
           <Route path="/iniciar-sesion" element={user ? <Navigate to="/rutinas" /> : <Login />} />
-          <Route path="/registrarse" element={user ? <Navigate to="/rutinas" /> : <Singup />} /> 
+          <Route path="/registrarse" element={user ? <Navigate to="/rutinas" /> : <Signup />} /> 
           
           {/* RUTAS PROTEGIDAS: Si no hay usuario, redirige a Login */}
           <Route 

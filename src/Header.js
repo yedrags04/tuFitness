@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import logo from './img/logo192.png'; 
-import { Link, useNavigate } from 'react-router-dom'; // Importamos useNavigate
+import { Link } from 'react-router-dom'; // Importamos useNavigate
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null); // 1. Estado para saber si hay usuario
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   // Al cargar el Header, revisamos si hay sesión guardada
   useEffect(() => {

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './css/Login.css'; 
 import { gsap } from 'gsap'; 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, } from 'react-router-dom';
 import axios from 'axios'; // Importante para la conexión API
 
 //Asegúrate de importar y registrar los plugins GSAP si los estás usando
@@ -10,7 +10,7 @@ import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
 gsap.registerPlugin(Draggable, MorphSVGPlugin); 
 
 function Login() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ 
     username: '', 
     password: '' 

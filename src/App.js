@@ -7,7 +7,7 @@ import Singup from './Singup';
 import HomeContent from './HomeContent'; 
 import Rutinas from './Rutinas';
 import EditarRutina from './EditarRutina'
-import { useState } from 'react';
+//import { useState } from 'react';
 
 function App() {
   // Verificamos si hay un usuario guardado en localStorage

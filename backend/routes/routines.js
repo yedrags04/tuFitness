@@ -3,11 +3,13 @@ const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { Routine, Exercise, Op } = require('../db/sequelize'); 
 
-// Middleware para verificar token (seguridad de la API)
+// Middleware para verificar token
 const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.token;
+  const authHeader = req.headers['x-auth-token'] || req.headers.token; // Aceptamos ambos nombres por si acaso
   if (authHeader) {
-    const token = authHeader.split(" ")[1] || authHeader;
+    // Si viene con "Bearer token" o solo "token", intentamos limpiar
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+    
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) return res.status(403).json("Token inválido");
       req.user = user; 
@@ -19,10 +21,8 @@ const verifyToken = (req, res, next) => {
 };
 
 // @route   GET api/routines
-// @desc    Obtener todas las rutinas (Propias + Predeterminadas)
 router.get('/', verifyToken, async (req, res) => {
   try {
-    // Busca donde UserId es el usuario logueado OR isDefault es true
     const routines = await Routine.findAll({
       where: {
         [Op.or]: [
@@ -30,49 +30,61 @@ router.get('/', verifyToken, async (req, res) => {
           { isDefault: true }
         ]
       },
-      include: Exercise, 
+      include: [Exercise], // Incluir los ejercicios al pedir las rutinas
       order: [['id', 'DESC']]
     });
-    
     res.status(200).json(routines);
   } catch (err) {
+    console.error(err);
     res.status(500).send('Error del servidor');
   }
 });
 
-// @route   PUT api/routines/:id
-// @desc    Editar rutina (solo si es propia del usuario y no predeterminada)
-router.put('/:id', verifyToken, async (req, res) => {
-  const routineId = req.params.id;
-  const { name, focus, exercises } = req.body;
+// @route   POST api/routines  <--- ESTA ERA LA QUE FALTABA
+// @desc    Crear nueva rutina
+router.post('/', verifyToken, async (req, res) => {
+    const { name, duration, exercises } = req.body;
 
-  try {
-    const routine = await Routine.findOne({ where: { id: routineId } });
-    
-    if (!routine) {
-      return res.status(404).json("Rutina no encontrada.");
+    try {
+        // 1. Crear la Rutina Padre
+        const newRoutine = await Routine.create({
+            name,
+            duration,
+            UserId: req.user.id,
+            isDefault: false
+        });
+
+        // 2. Si hay ejercicios, añadirlos vinculándolos a la rutina creada
+        if (exercises && exercises.length > 0) {
+            const exercisesWithId = exercises.map(ex => ({
+                ...ex,
+                RoutineId: newRoutine.id // Vinculamos con la ID de la rutina recién creada
+            }));
+            await Exercise.bulkCreate(exercisesWithId);
+        }
+
+        res.status(201).json(newRoutine);
+    } catch (err) {
+        console.error("Error creando rutina:", err);
+        res.status(500).json("Error al guardar la rutina");
     }
-    
-    // Verificación CLAVE
-    if (routine.UserId !== req.user.id || routine.isDefault) {
-      return res.status(403).json("No tienes permiso para editar esta rutina (es predeterminada o de otro usuario).");
+});
+
+// @route   DELETE api/routines/:id
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        const routine = await Routine.findOne({ where: { id: req.params.id } });
+        if (!routine) return res.status(404).json("Rutina no encontrada");
+
+        if (routine.UserId !== req.user.id) {
+            return res.status(403).json("No tienes permiso");
+        }
+
+        await routine.destroy();
+        res.status(200).json("Rutina eliminada");
+    } catch (err) {
+        res.status(500).json(err);
     }
-
-    // Actualización de la rutina principal
-    await routine.update({ name, focus });
-    
-    // Actualizar los ejercicios relacionados
-    if (exercises) {
-      await Exercise.destroy({ where: { RoutineId: routineId } });
-      const updatedExercises = exercises.map(ex => ({ ...ex, RoutineId: routineId }));
-      await Exercise.bulkCreate(updatedExercises);
-    }
-
-    res.status(200).json({ msg: "Rutina actualizada con éxito" });
-
-  } catch (err) {
-    res.status(500).send('Error del servidor al editar rutina');
-  }
 });
 
 module.exports = router;

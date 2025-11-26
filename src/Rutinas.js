@@ -100,7 +100,10 @@ const Rutinas = () => {
         day.exercises.forEach(ex => {
             if(ex.name.trim() !== '') { // Solo añadir si tiene nombre
                 flatExercises.push({
-                    ...ex,
+                    name: ex.name,
+                    sets: parseInt(ex.sets) || 0, 
+                    reps: parseInt(ex.reps) || 0, 
+                    weight: parseFloat(ex.weight) || 0, 
                     day: day.dayNumber
                 });
             }
@@ -252,7 +255,7 @@ const Rutinas = () => {
                 </div>
 
                 <div className="modal-actions">
-                    <button type="button" onClick={() => setShowModal(false)} style={{background:'transparent', border:'1px solid #555', color:'white', padding:'10px 20px', borderRadius:'5px', cursor:'pointer'}}>Cancelar</button>
+                    <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
                     <button type="submit" className="btn-save">Guardar Rutina</button>
                 </div>
             </form>

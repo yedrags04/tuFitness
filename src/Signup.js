@@ -29,7 +29,7 @@ function Signup() {
     
     try {
       // Llamada a la API
-      const res = await axios.post("http://localhost:42311/api/auth/register", formData);
+      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
       
       // Verificamos el código de estado 201 (Created)
       if (res.status === 201) {

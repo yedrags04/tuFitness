@@ -1,35 +1,31 @@
 // backend/db/sequelize.js
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const dotenv = require('dotenv');
+const sqlite3 = require('@libsql/sqlite3');
 
 dotenv.config();
 
-// Determinar si estamos en producción (nube) o desarrollo (local)
-// Si el host es 'localhost' o '127.0.0.1', asumimos que es local y NO usamos SSL
-const isLocal = process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1';
-
-const sequelize = new Sequelize(
-  process.env.DB_NAME, 
-  process.env.DB_USER, 
-  process.env.DB_PASSWORD, 
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
-    dialect: 'mysql',
-    logging: false,
-    // Solo activamos SSL si NO estamos en local
-    dialectOptions: isLocal ? {} : {
-        ssl: {
-            require: true,
-            rejectUnauthorized: false
-        }
+// --- FIX PARA WINDOWS Y TURSO ---
+// Creamos un "intermediario" para engañar a Sequelize.
+// Sequelize creerá que se conecta a ':memory:' (y no intentará crear carpetas raras),
+// pero nosotros forzamos la conexión real a Turso por detrás.
+const customDriver = {
+    ...sqlite3,
+    Database: function(filename, mode, callback) {
+        // Aquí ocurre la magia: ignoramos ':memory:' y usamos tu URL real
+        const realUrl = process.env.TURSO_CONNECTION_URL;
+        return new sqlite3.Database(realUrl, mode, callback);
     }
-  }
-);
+};
 
-// ... (MANTÉN EL RESTO DE TUS MODELOS USER, ROUTINE, EXERCISE IGUAL QUE ANTES) ...
-// ...
-// ...
+console.log("🔄 Conectando a Turso (usando fix para Windows)...");
+
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  dialectModule: customDriver, // Usamos nuestro driver trucado
+  storage: ':memory:',         // Valor falso para que Sequelize no se queje en Windows
+  logging: false
+});
 
 // --- 2. DEFINICIÓN DE MODELOS ---
 const User = sequelize.define('User', { 
@@ -65,7 +61,7 @@ Exercise.belongsTo(Routine);
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('✅ Conexión a la base de datos exitosa.');
+        console.log('✅ Conexión a Turso exitosa (Nube).');
         await sequelize.sync({ alter: true }); 
         console.log('✅ Modelos sincronizados.');
     } catch (error) {

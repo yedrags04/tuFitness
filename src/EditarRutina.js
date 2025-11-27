@@ -1,142 +1,260 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 import './css/EditarRutina.css';
 
-
 function EditarRutina() {
-  
+  const { id } = useParams(); // Obtenemos el ID de la URL
+  const navigate = useNavigate();
+
+  // Estados para modales
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSerieModal, setShowSerieModal] = useState(false);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
-
   
-  const [currentItem, setCurrentItem] = useState(null);
+  // Estado principal de la rutina
+  const [routineName, setRoutineName] = useState('');
+  const [daysData, setDaysData] = useState([]); // Array estructurado por días
+  const [loading, setLoading] = useState(true);
 
-  // --- FUNCIONES PARA ABRIR/CERRAR VENTANAS ---
+  // Estado para controlar qué se está editando/borrando
+  // Guardamos índices: { dayIndex, exerciseIndex }
+  const [targetItem, setTargetItem] = useState(null);
 
-  // 1. Eliminar Ejercicio
-  const handleDeleteClick = (exerciseName) => {
-    setCurrentItem(exerciseName); // Guardamos qué ejercicio queremos borrar
+  // Estado temporal para el formulario de Nuevo Ejercicio
+  const [newExerciseForm, setNewExerciseForm] = useState({
+    name: '', sets: '', reps: '', weight: '', dayNumber: 1
+  });
+
+  // ==========================================
+  // 1. CARGAR DATOS (FETCH)
+  // ==========================================
+  useEffect(() => {
+    const fetchRoutine = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return navigate('/iniciar-sesion');
+
+      try {
+        const res = await axios.get(`http://localhost:5000/api/routines/${id}`, {
+          headers: { 'x-auth-token': token }
+        });
+        
+        const routine = res.data;
+        setRoutineName(routine.name);
+
+        // TRANSFORMACIÓN DE DATOS:
+        // El backend devuelve un array plano de ejercicios.
+        // Lo agrupamos por día para pintarlo fácil.
+        const maxDay = routine.exercises.reduce((max, ex) => Math.max(max, ex.day || 1), 0) || 1;
+        const structuredDays = [];
+
+        for (let i = 1; i <= maxDay; i++) {
+            structuredDays.push({
+                dayNumber: i,
+                exercises: routine.exercises.filter(ex => ex.day === i)
+            });
+        }
+        setDaysData(structuredDays);
+        setLoading(false);
+
+      } catch (err) {
+        console.error(err);
+        alert("Error al cargar la rutina");
+        navigate('/rutinas');
+      }
+    };
+
+    fetchRoutine();
+  }, [id, navigate]);
+
+
+  // ==========================================
+  // 2. LÓGICA DE ACTUALIZACIÓN (GUARDAR CAMBIOS)
+  // ==========================================
+  const handleSaveRoutine = async () => {
+    const token = localStorage.getItem('token');
+    
+    // Aplanamos de nuevo la estructura para enviarla al backend
+    const flatExercises = [];
+    daysData.forEach(day => {
+        day.exercises.forEach(ex => {
+            flatExercises.push({
+                name: ex.name,
+                sets: Number(ex.sets),
+                reps: Number(ex.reps),
+                weight: Number(ex.weight),
+                day: day.dayNumber
+            });
+        });
+    });
+
+    try {
+        await axios.put(`http://localhost:5000/api/routines/${id}`, {
+            name: routineName,
+            exercises: flatExercises
+        }, {
+            headers: { 'x-auth-token': token }
+        });
+        alert("Rutina actualizada correctamente");
+        navigate('/rutinas');
+    } catch (err) {
+        console.error(err);
+        alert("Error al guardar cambios");
+    }
+  };
+
+
+  // ==========================================
+  // 3. MANEJADORES DE ACCIÓN
+  // ==========================================
+
+  // --- ELIMINAR EJERCICIO ---
+  const clickDelete = (dayIndex, exIndex) => {
+    setTargetItem({ dayIndex, exIndex });
     setShowDeleteModal(true);
   };
 
   const confirmDelete = () => {
-    alert(`Se ha eliminado el ejercicio: ${currentItem}`); // Aquí iría la lógica real de borrado
+    if (!targetItem) return;
+    const { dayIndex, exIndex } = targetItem;
+    
+    const updatedDays = [...daysData];
+    updatedDays[dayIndex].exercises.splice(exIndex, 1); // Borrar del array
+    
+    setDaysData(updatedDays);
     setShowDeleteModal(false);
+    setTargetItem(null);
   };
 
-  // 2. Añadir Serie
-  const handleAddSerieClick = (exerciseName) => {
-    setCurrentItem(exerciseName);
-    setShowSerieModal(true);
-  };
-
-  const saveSerie = (e) => {
-    e.preventDefault();
-    // Aquí recogerías los datos del form (e.target.reps.value, etc.)
-    alert(`Serie añadida a ${currentItem}`);
-    setShowSerieModal(false);
-  };
-
-  // 3. Añadir Ejercicio
-  const handleAddExerciseClick = () => {
+  // --- AÑADIR EJERCICIO (ABRIR MODAL) ---
+  const clickAddExercise = (dayNum) => {
+    // Pre-llenamos el día correspondiente
+    setNewExerciseForm({ name: '', sets: '', reps: '', weight: '', dayNumber: dayNum });
     setShowExerciseModal(true);
   };
 
-  const saveExercise = (e) => {
+  // --- GUARDAR NUEVO EJERCICIO ---
+  const saveNewExercise = (e) => {
     e.preventDefault();
-    alert("Ejercicio nuevo añadido");
+    const { dayNumber, name, sets, reps, weight } = newExerciseForm;
+    
+    // Buscar si el día ya existe en nuestro estado local
+    const dayIndex = daysData.findIndex(d => d.dayNumber === dayNumber);
+    
+    const newExObj = { name, sets, reps, weight, day: dayNumber };
+    const updatedDays = [...daysData];
+
+    if (dayIndex >= 0) {
+        updatedDays[dayIndex].exercises.push(newExObj);
+    } else {
+        // Si añadimos un ejercicio a un día que no existía visualmente aun
+        updatedDays.push({ dayNumber: dayNumber, exercises: [newExObj] });
+        // Ordenar por numero de día
+        updatedDays.sort((a,b) => a.dayNumber - b.dayNumber);
+    }
+
+    setDaysData(updatedDays);
     setShowExerciseModal(false);
   };
 
+  // --- EDITAR VALORES INPUT (Nombre, Series, Reps) ---
+  // Esto permite editar directamente en las tarjetas sin abrir modal
+  const handleInlineChange = (dayIndex, exIndex, field, value) => {
+      const updatedDays = [...daysData];
+      updatedDays[dayIndex].exercises[exIndex][field] = value;
+      setDaysData(updatedDays);
+  };
+
+
+  if (loading) return <div className="rutina-page"><p>Cargando...</p></div>;
 
   return (
     <div className="rutina-page">
-      <h1>Rutina 1</h1>
+      {/* Cabecera Editable */}
+      <div className="header-edit">
+        <input 
+            className="routine-title-input"
+            value={routineName} 
+            onChange={(e) => setRoutineName(e.target.value)} 
+        />
+        <button className="btn-save-global" onClick={handleSaveRoutine}>Guardar Cambios</button>
+      </div>
       
       <div className="dias-container">
         
-        {/* --- DIA 1 --- */}
-        <div className="Dias">
-          <h2>DIA 1</h2>
-          <h3>Dia de Gluteo</h3>
-          <h4>Ejercicios</h4>
+        {/* MAPEO DE DÍAS */}
+        {daysData.map((day, dayIndex) => (
+            <div className="Dias" key={day.dayNumber}>
+                <h2>DÍA {day.dayNumber}</h2>
+                <h4>Ejercicios</h4>
 
-          {/* Ejercicio 1 */}
-          <div className="ejercicio">
-            <h5>Hip thrust</h5>
-            <div className="serie">
-              <h6>Serie 1</h6>
-              <p>Repeticiones: 12</p>
-              <p>Peso: 15 kg</p>
+                {/* MAPEO DE EJERCICIOS DENTRO DEL DÍA */}
+                {day.exercises.map((exercise, exIndex) => (
+                    <div className="ejercicio" key={exIndex}>
+                        {/* Nombre del Ejercicio Editable */}
+                        <input 
+                            className="input-exercise-name"
+                            value={exercise.name}
+                            onChange={(e) => handleInlineChange(dayIndex, exIndex, 'name', e.target.value)}
+                            placeholder="Nombre ejercicio"
+                        />
+                        
+                        <div className="serie">
+                            {/* Usamos el diseño de "Serie" para mostrar los datos editables */}
+                            <h6>Datos Generales</h6>
+                            <div className="serie-inputs">
+                                <label>Series:</label>
+                                <input 
+                                    type="number" 
+                                    value={exercise.sets} 
+                                    onChange={(e) => handleInlineChange(dayIndex, exIndex, 'sets', e.target.value)}
+                                />
+                                <label>Reps:</label>
+                                <input 
+                                    type="number" 
+                                    value={exercise.reps} 
+                                    onChange={(e) => handleInlineChange(dayIndex, exIndex, 'reps', e.target.value)}
+                                />
+                                <label>Peso:</label>
+                                <input 
+                                    type="number" 
+                                    value={exercise.weight} 
+                                    onChange={(e) => handleInlineChange(dayIndex, exIndex, 'weight', e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        
+                        {/* BOTÓN ELIMINAR */}
+                        <button 
+                            className="btn-action btn-delete"
+                            onClick={() => clickDelete(dayIndex, exIndex)}
+                        >
+                            Eliminar ejercicio
+                        </button>
+                    </div>
+                ))}
+
+                {/* BOTÓN AÑADIR AL DÍA */}
+                <button 
+                    className="btn-action btn-add-exercise"
+                    onClick={() => clickAddExercise(day.dayNumber)}
+                >
+                    + Añadir ejercicio al Día {day.dayNumber}
+                </button>
             </div>
-            {/* ... más series ... */}
-            
-            {/* BOTONES DEL EJERCICIO */}
-            <button 
-                className="btn-action btn-add-serie" 
-                onClick={() => handleAddSerieClick("Hip thrust")}
-            >
-                + Añadir Serie
-            </button>
-            <button 
-                className="btn-action btn-delete"
-                onClick={() => handleDeleteClick("Hip thrust")}
-            >
-                Eliminar ejercicio
-            </button>
-          </div>
+        ))}
 
-          {/* Ejercicio 2 */}
-          <div className="ejercicio">
-            <h5>Sentadilla búlgara</h5>
-            <div className="serie">
-              <h6>Serie 1</h6>
-              <p>Repeticiones: 12</p>
-              <p>Peso: 15 kg</p>
-            </div>
-            
-            {/* BOTONES DEL EJERCICIO */}
-            <button 
-                className="btn-action btn-add-serie"
-                onClick={() => handleAddSerieClick("Sentadilla búlgara")}
-            >
-                + Añadir Serie
-            </button>
-            <button 
-                className="btn-action btn-delete"
-                onClick={() => handleDeleteClick("Sentadilla búlgara")}
-            >
-                Eliminar ejercicio
-            </button>
-          </div>
-
-          {/* BOTÓN GENERAL DEL DÍA */}
-          <button 
-            className="btn-action btn-add-exercise"
-            onClick={handleAddExerciseClick}
-          >
-            + Añadir ejercicio
-          </button>
-
-        </div>
-
-        {/* --- DIA 2 (Ejemplo breve) --- */}
-        <div className="Dias">
-            <h2>DIA 2</h2>
-            <h3>Dia de tren superior</h3>
-            {/* ... contenido ... */}
-             <button 
-                className="btn-action btn-add-exercise"
-                onClick={handleAddExerciseClick}
-            >
-                + Añadir ejercicio
-            </button>
-        </div>
+        {/* Botón para agregar un nuevo día (opcional) */}
+        <button 
+            className="btn-add-day"
+            onClick={() => clickAddExercise(daysData.length + 1)}
+        >
+            + Agregar Día Nuevo
+        </button>
 
       </div>
 
       {/* ========================================== */}
-      {/* VENTANAS EMERGENTES (MODALES)              */}
+      {/* MODALES                                    */}
       {/* ========================================== */}
 
       {/* 1. MODAL ELIMINAR */}
@@ -144,64 +262,46 @@ function EditarRutina() {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>⚠️ ¿Estás seguro?</h3>
-            <p>Vas a eliminar el ejercicio <strong>{currentItem}</strong>. Esta acción no se puede deshacer.</p>
+            <p>Se eliminará este ejercicio. Recuerda pulsar "Guardar Cambios" arriba para confirmar en la base de datos.</p>
             <div className="modal-actions">
               <button className="btn-action btn-cancel" onClick={() => setShowDeleteModal(false)}>Cancelar</button>
-              <button className="btn-action btn-danger" onClick={confirmDelete}>Eliminar</button>
+              <button className="btn-action btn-delete" onClick={confirmDelete}>Eliminar</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 2. MODAL AÑADIR SERIE */}
-      {showSerieModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3>Añadir Serie</h3>
-            <p>Para: <strong>{currentItem}</strong></p>
-            <form onSubmit={saveSerie}>
-                <div className="modal-input-group">
-                    <label>Repeticiones:</label>
-                    <input type="number" name="reps" placeholder="Ej: 12" required />
-                </div>
-                <div className="modal-input-group">
-                    <label>Peso (kg):</label>
-                    <input type="number" name="weight" placeholder="Ej: 20" required />
-                </div>
-                <div className="modal-actions">
-                    <button type="button" className="btn-action btn-cancel" onClick={() => setShowSerieModal(false)}>Cancelar</button>
-                    <button type="submit" className="btn-action btn-confirm">Guardar</button>
-                </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 3. MODAL AÑADIR EJERCICIO */}
+      {/* 2. MODAL AÑADIR EJERCICIO */}
       {showExerciseModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Nuevo Ejercicio</h3>
-            <form onSubmit={saveExercise}>
+            <h3>Nuevo Ejercicio (Día {newExerciseForm.dayNumber})</h3>
+            <form onSubmit={saveNewExercise}>
                 <div className="modal-input-group">
-                    <label>Grupo Muscular:</label>
-                    <select>
-                        <option>Glúteo</option>
-                        <option>Pierna</option>
-                        <option>Espalda</option>
-                        <option>Pecho</option>
-                    </select>
+                    <label>Nombre Ejercicio:</label>
+                    <input 
+                        type="text" 
+                        required 
+                        value={newExerciseForm.name}
+                        onChange={(e) => setNewExerciseForm({...newExerciseForm, name: e.target.value})}
+                        placeholder="Ej: Press Banca"
+                    />
                 </div>
-                <div className="modal-input-group">
-                    <label>Ejercicio:</label>
-                    <select>
-                        <option>Sentadilla</option>
-                        <option>Hip Thrust</option>
-                        <option>Peso Muerto</option>
-                        <option>Prensa</option>
-                        {/* Aquí podrías cargar una lista dinámica */}
-                    </select>
+                <div className="modal-row">
+                    <div className="modal-input-group">
+                        <label>Series:</label>
+                        <input type="number" required value={newExerciseForm.sets} onChange={(e) => setNewExerciseForm({...newExerciseForm, sets: e.target.value})}/>
+                    </div>
+                    <div className="modal-input-group">
+                        <label>Reps:</label>
+                        <input type="number" required value={newExerciseForm.reps} onChange={(e) => setNewExerciseForm({...newExerciseForm, reps: e.target.value})}/>
+                    </div>
+                    <div className="modal-input-group">
+                        <label>Peso:</label>
+                        <input type="number" value={newExerciseForm.weight} onChange={(e) => setNewExerciseForm({...newExerciseForm, weight: e.target.value})}/>
+                    </div>
                 </div>
+
                 <div className="modal-actions">
                     <button type="button" className="btn-action btn-cancel" onClick={() => setShowExerciseModal(false)}>Cancelar</button>
                     <button type="submit" className="btn-action btn-confirm">Añadir</button>

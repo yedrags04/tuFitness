@@ -2,6 +2,7 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { Routine, Exercise, Op } = require('../db/sequelize'); 
+const auth = require('../routes/auth');
 
 // Middleware para verificar token
 const verifyToken = (req, res, next) => {
@@ -84,6 +85,69 @@ router.delete('/:id', verifyToken, async (req, res) => {
         res.status(200).json("Rutina eliminada");
     } catch (err) {
         res.status(500).json(err);
+    }
+});
+
+// Ejemplo de ruta backend (Node/Express)
+router.put('/:id', auth, async (req, res) => {
+    const { name, duration, exercises } = req.body;
+    const routineId = req.params.id;
+    const userId = req.user.id; // Viene del token (auth)
+
+    // Validación básica
+    if (!name) {
+        return res.status(400).json({ msg: 'Por favor incluye el nombre de la rutina' });
+    }
+
+    try {
+        // 1. Verificar que la rutina existe y pertenece al usuario
+        // (Ajusta 'client' o 'db' según cómo llames a tu conexión de Turso)
+        const check = await client.execute({
+            sql: "SELECT * FROM routines WHERE id = ? AND user_id = ?",
+            args: [routineId, userId]
+        });
+
+        if (check.rows.length === 0) {
+            return res.status(404).json({ msg: 'Rutina no encontrada o no autorizado' });
+        }
+
+        // 2. Actualizar los datos básicos de la rutina
+        await client.execute({
+            sql: "UPDATE routines SET name = ?, duration = ? WHERE id = ?",
+            args: [name, duration, routineId]
+        });
+
+        // 3. Actualizar los ejercicios
+        // ESTRATEGIA: Borrar los viejos y crear los nuevos (es más limpio que actualizar uno por uno)
+        
+        // A) Borrar ejercicios antiguos de esta rutina
+        await client.execute({
+            sql: "DELETE FROM exercises WHERE routine_id = ?",
+            args: [routineId]
+        });
+
+        // B) Insertar los nuevos ejercicios (si hay)
+        if (exercises && exercises.length > 0) {
+            for (const ex of exercises) {
+                await client.execute({
+                    sql: "INSERT INTO exercises (routine_id, name, sets, reps, weight, day) VALUES (?, ?, ?, ?, ?, ?)",
+                    args: [
+                        routineId, 
+                        ex.name, 
+                        ex.sets || 0, 
+                        ex.reps || 0, 
+                        ex.weight || 0, 
+                        ex.day || 1
+                    ]
+                });
+            }
+        }
+
+        res.json({ msg: 'Rutina actualizada correctamente' });
+
+    } catch (err) {
+        console.error("Error al actualizar rutina:", err.message);
+        res.status(500).send('Error del servidor');
     }
 });
 

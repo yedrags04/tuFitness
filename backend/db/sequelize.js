@@ -139,11 +139,28 @@ Routine.belongsTo(User);
 Routine.hasMany(Exercise, { onDelete: 'CASCADE' }); 
 Exercise.belongsTo(Routine);
 
+// En backend/db/sequelize.js
+
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
         console.log('✅ Conexión a Turso establecida.');
+        
+        // 1. Desactivar claves foráneas para poder tocar las tablas sin errores
+        await sequelize.query('PRAGMA foreign_keys = OFF;');
+
+        // 2. LIMPIEZA PREVENTIVA: Borrar cualquier tabla backup que se haya quedado "colgada"
+        // Esto es lo que arregla tu error actual y futuros
+        await sequelize.query('DROP TABLE IF EXISTS `User_backup`;');
+        await sequelize.query('DROP TABLE IF EXISTS `Routine_backup`;');
+        await sequelize.query('DROP TABLE IF EXISTS `Exercise_backup`;');
+
+        // 3. Sincronizar (alter: true intentará ajustar las tablas sin borrar datos)
         await sequelize.sync({ alter: true }); 
+
+        // 4. Reactivar claves foráneas
+        await sequelize.query('PRAGMA foreign_keys = ON;');
+
         console.log('✅ Tablas sincronizadas correctamente.');
     } catch (error) {
         console.error('❌ Error crítico en la conexión:', error);

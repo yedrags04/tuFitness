@@ -1,12 +1,13 @@
 // backend/server.js
-const express = require('express');
 const dotenv = require('dotenv');
+dotenv.config();
+const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./db/sequelize'); 
 const authRoute = require('./routes/auth');
 const routineRoute = require('./routes/routines');
 
-dotenv.config();
+
 const app = express();
 
 // Iniciar la conexión a la base de datos

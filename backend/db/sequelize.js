@@ -156,7 +156,7 @@ const connectDB = async () => {
         await sequelize.query('DROP TABLE IF EXISTS `Exercise_backup`;');
 
         // 3. Sincronizar (alter: true intentará ajustar las tablas sin borrar datos)
-        await sequelize.sync({ alter: true }); 
+        await sequelize.sync({ force: false }); 
 
         // 4. Reactivar claves foráneas
         await sequelize.query('PRAGMA foreign_keys = ON;');

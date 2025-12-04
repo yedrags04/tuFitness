@@ -85,7 +85,7 @@
 
 /* Distinción sutil para rutinas predeterminadas */
 .routine-card.default-card {
-    border-color: #28a745; 
+    border-color: #253237; 
     background-color: #a0c4d0; /* Un tono ligeramente diferente */
 }
 
@@ -154,7 +154,7 @@
 
 .btn-view { background-color: #3d5a80; color: white; }
 .btn-edit { background-color: #253237; color: #E0FBFC; }
-.btn-customize { background-color: #ee9b00; color: #253237; }
+.btn-customize { background-color: #5C6B73; color: white; }
 .btn-delete { background: #e63946; color: white; flex: 0; min-width: auto; padding: 8px 15px;}
 
 

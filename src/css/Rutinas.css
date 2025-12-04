@@ -6,8 +6,8 @@
   background-color: #E0FBFC; /* Fondo claro base */
   color: #253237; /* Texto oscuro principal */
   min-height: 100vh;
-  padding: 100px 20px 50px; /* Padding ajustado al estilo del target */
-  max-width: 1400px !important; /* Un poco más ancho para coincidir */
+  padding: 100px 20px 50px;
+  max-width: 1400px;
   margin: 0 auto;
   font-family: system-ui, -apple-system, sans-serif;
 }
@@ -19,7 +19,6 @@
   margin-bottom: 40px;
 }
 
-.rutinas-header h1, 
 .rutinas-header h2 {
   font-size: 2.5rem;
   text-transform: uppercase;
@@ -29,13 +28,20 @@
   margin: 0;
 }
 
-/* Botón "Crear Rutina" (Estilo btn-add-serie / btn-action) */
+.divider {
+  border: 0;
+  height: 2px;
+  background: #9DB4C0;
+  margin: 40px 0;
+}
+
+/* Botón "Crear Rutina" */
 .btn-crear {
-  background-color: #253237; /* Color oscuro */
-  color: #E0FBFC; /* Texto claro */
+  background-color: #253237;
+  color: #E0FBFC;
   border: none;
   padding: 12px 24px;
-  border-radius: 8px; /* Radio consistente */
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 1rem;
@@ -46,11 +52,11 @@
 .btn-crear:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  background-color: #1a2428; /* Un poco más oscuro al hover */
+  background-color: #1a2428;
 }
 
 /* =========================================
-   2. GRILLA Y TARJETAS (Routine Card)
+   2. GRILLA Y TARJETAS (VISTA PRINCIPAL)
    ========================================= */
 
 .routines-grid {
@@ -60,13 +66,12 @@
   width: 100%;
 }
 
-/* Adaptación al estilo ".Dias" */
 .routine-card {
-  background-color: #9DB4C0; /* Fondo gris azulado de la tarjeta */
+  background-color: #9DB4C0; /* Fondo gris azulado */
   padding: 2rem;
-  border-radius: 20px; /* Bordes muy redondeados */
-  border: 2px solid rgb(79, 80, 81); /* Borde gris oscuro */
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* Sombra suave */
+  border-radius: 20px;
+  border: 2px solid rgb(79, 80, 81);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
@@ -78,11 +83,17 @@
   box-shadow: 0 15px 30px rgba(0,0,0,0.2);
 }
 
+/* Distinción sutil para rutinas predeterminadas */
+.routine-card.default-card {
+    border-color: #28a745; 
+    background-color: #a0c4d0; /* Un tono ligeramente diferente */
+}
+
 .routine-card h3 {
   margin-top: 0;
   color: #253237;
   font-size: 1.8rem;
-  border-bottom: 3px solid #253237; /* Subrayado estilo referencia */
+  border-bottom: 3px solid #253237;
   padding-bottom: 10px;
   margin-bottom: 15px;
   text-transform: uppercase;
@@ -90,295 +101,90 @@
 
 .routine-card p {
     color: #2f3e44;
-    font-weight: 500;
+    font-weight: 600;
+}
+
+.routine-card ul {
+    list-style: none;
+    padding: 0;
+    color: #253237;
+    margin-bottom: 15px;
+}
+
+.routine-card li {
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+.routine-tags {
+    margin-top: auto;
+    margin-bottom: 15px;
+}
+
+.tag-day {
+    background-color: #253237;
+    color: #E0FBFC;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
 }
 
 /* Botones dentro de la tarjeta */
 .routine-actions {
-  margin-top: 20px;
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Botón genérico de acción en tarjeta */
 .routine-actions button {
-    padding: 8px 16px;
+    flex: 1;
+    padding: 8px 10px;
     border-radius: 8px;
     font-weight: 600;
     border: none;
     cursor: pointer;
     transition: transform 0.2s;
+    font-size: 0.9rem;
 }
 
 .routine-actions button:hover {
     transform: translateY(-2px);
 }
 
-/* Botón Eliminar (Rojo estilo referencia) */
-.btn-delete {
-  background: #e63946;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+.btn-view { background-color: #3d5a80; color: white; }
+.btn-edit { background-color: #253237; color: #E0FBFC; }
+.btn-customize { background-color: #ee9b00; color: #253237; }
+.btn-delete { background: #e63946; color: white; flex: 0; min-width: auto; padding: 8px 15px;}
+
 
 /* =========================================
-   3. MODAL (La Cajita Flotante)
+   3. MODAL (LA CAJA FLOTANTE)
    ========================================= */
 
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Oscuro semitransparente */
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(37, 50, 55, 0.8); /* Fondo oscuro semitransparente */
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 14px;
   z-index: 1000;
-  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
 
-.modal-content {
+.modal-content.wide-modal {
   background-color: #E0FBFC; /* Fondo claro */
-  width: 90%;
-  max-width: 1200px;
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 30px;
+  width: 95%;
+  max-width: 1300px;
+  height: 90vh;
   border-radius: 20px;
-  border: 2px solid #253237; /* Borde oscuro */
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  position: relative;
-  color: #253237;
-  animation: popIn 0.3s ease;
-}
-
-/* Botón cerrar (X) */
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  font-size: 28px;
-  background: none;
-  border: none;
-  color: #253237;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.close-btn:hover {
-    color: #e63946;
-}
-
-/* =========================================
-   4. FORMULARIOS DENTRO DEL MODAL
-   ========================================= */
-
-.form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  flex: 1;
+  border: 4px solid #253237;
   display: flex;
   flex-direction: column;
-}
-
-.form-group label{
-  margin-bottom: 8px;
-  color: #253237;
-  font-weight: 800; /* Negrita como en modal referencia */
-  text-shadow: none !important;
-}
-
-.form-group input, 
-.form-group select {
-  padding: 12px;
-  background-color: #ffffff; /* Fondo blanco para inputs */
-  border: 1px solid #9DB4C0;
-  border-radius: 8px;
-  color: #253237;
-  font-size: 1rem;
-}
-
-.form-group input:focus, 
-.form-group select:focus {
-    outline: none;
-    border-color: #253237;
-    box-shadow: 0 0 0 2px rgba(37, 50, 55, 0.1);
-}
-
-/* =========================================
-   5. SECCIÓN DE DÍAS Y EJERCICIOS
-   ========================================= */
-
-/* Estilo similar a ".ejercicio" o ".serie" */
-.day-section {
-  background-color: rgba(255, 255, 255, 0.6); /* Semi-transparente sobre el fondo claro */
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 15px;
-  border: 1px solid rgba(37, 50, 55, 0.1);
-  border-left: 6px solid #253237; /* Acento lateral oscuro */
-}
-
-.day-section h4 {
-    margin-top: 0;
-    color: #253237;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-}
-
-.exercise-row {
-  display: grid;
-  grid-template-columns: 2fr 0.5fr 0.5fr 0.5fr auto;
-  gap: 15px;
-  margin-bottom: 15px;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.5);
-  padding: 15px;
-  border-radius: 8px;
-}
-
-.exercise-row input {
-  width: 100%;
-  padding: 10px;
-  background: #ffffff;
-  border: 1px solid #ccc;
-  color: #253237;
-  border-radius: 6px;
-  text-align: center;
-}
-
-/* El primer input (Nombre) alineado a la izquierda */
-.exercise-row input:first-child {
-    text-align: left;
-}
-
-/* Estilo específico para los encabezados (los span que dicen Ejercicio, Series...) */
-.exercise-row span {
-    font-weight: 800;
-    text-align: center;
-    font-size: 0.9rem;
-}
-.exercise-row span:first-child {
-    text-align: left;
-    padding-left: 5px;
-}
-
-/* Botón añadir ejercicio (Dashed style) */
-.btn-add-exercise {
-  background: transparent;
-  border: 2px dashed #253237;
-  color: #253237;
-  width: 100%;
-  padding: 12px;
-  cursor: pointer;
-  margin-top: 10px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.btn-add-exercise:hover {
-  background-color: #253237;
-  color: #E0FBFC;
-}
-
-/* Botón eliminar fila (pequeño texto o icono) */
-.btn-remove {
-  background: transparent;
-  color: #e63946;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 1.2rem;
-  padding: 0 10px;
-}
-
-.btn-remove:hover {
-    transform: scale(1.1);
-}
-
-.btn-cancel {
-  flex: 1;
-  background-color: transparent; /* Sin fondo para diferenciarlo del principal */
-  color: #253237; /* Mismo color oscuro del tema */
-  border: 2px solid #253237; /* Borde sólido del mismo color */
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.2s;
-}
-
-.btn-cancel:hover {
-  background-color: rgba(37, 50, 55, 0.1); /* Se oscurece ligeramente al pasar el ratón */
-  transform: translateY(-2px); /* Pequeña elevación */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* =========================================
-   6. ACCIONES DEL MODAL (Footer)
-   ========================================= */
-
-.modal-actions {
-  margin-top: 30px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  border-top: 1px solid #ccc;
-  padding-top: 20px;
-  width: 100%;
-}
-
-/* Botón Guardar */
-.btn-save {
-  flex: 2;
-  background-color: #253237;
-  color: #E0FBFC;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.2s;
-}
-
-.btn-save:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Botón Editar (Estilo acorde al tema) */
-.btn-edit {
-  background-color: #253237; /* El mismo color oscuro del header/botón crear */
-  color: #E0FBFC; /* Texto claro */
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s, background-color 0.2s;
-}
-
-.btn-edit:hover {
-  transform: translateY(-2px);
-  background-color: #35464d; /* Un tono ligeramente más claro al pasar el mouse */
+  overflow: hidden; /* Importante para el layout interno */
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: popIn 0.3s ease;
 }
 
 @keyframes popIn {
@@ -386,55 +192,303 @@
   to { transform: scale(1); opacity: 1; }
 }
 
+.modal-header {
+  padding: 20px 30px;
+  background-color: #9DB4C0; /* Cabecera gris azulada */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #253237;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #253237;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  color: #253237;
+  cursor: pointer;
+  line-height: 0.5;
+}
+.close-btn:hover { color: #e63946; }
+
+/* Formulario - Contenedor Flex */
+.routine-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Barra Superior (Inputs Generales) */
+.form-top-bar {
+  display: flex;
+  gap: 20px;
+  padding: 20px 30px;
+  background-color: rgba(157, 180, 192, 0.3);
+  border-bottom: 1px solid #9DB4C0;
+}
+
+.form-group { display: flex; flex-direction: column; flex: 1; }
+.form-group.small-group { flex: 0 0 120px; }
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #253237;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.form-group input {
+  background: #fff;
+  border: 2px solid #9DB4C0;
+  color: #253237;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.form-group input:focus { border-color: #253237; outline: none; }
+.form-group input:disabled { background: #e0e0e0; color: #777; border-color: #ccc; }
+
 /* =========================================
-   7. RESPONSIVE (MÓVILES)
+   4. AREA DE SCROLL HORIZONTAL (LO NUEVO)
+   ========================================= */
+
+.exercises-scroll-container {
+  flex: 1; /* Ocupa el resto de la altura vertical */
+  overflow-x: auto; /* Permite scroll lateral */
+  overflow-y: hidden;
+  display: flex;
+  padding: 20px 30px;
+  gap: 25px; /* Espacio entre columnas de días */
+  background-color: #f0fcfd; /* Un tono más claro que el contenedor */
+  
+  /* Estilizar barra de scroll */
+  scrollbar-width: thin;
+  scrollbar-color: #253237 #E0FBFC;
+}
+
+/* Columna de Día */
+.day-column {
+  min-width: 320px;
+  max-width: 350px;
+  background-color: #9DB4C0; /* Fondo de la columna */
+  border-radius: 12px;
+  border: 2px solid #253237;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 4px 4px 0px rgba(37, 50, 55, 0.2);
+}
+
+.day-title {
+  text-align: center;
+  padding: 15px;
+  margin: 0;
+  background-color: #253237; /* Cabecera oscura */
+  color: #E0FBFC; /* Texto claro */
+  border-radius: 8px 8px 0 0;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.day-exercises-list {
+  padding: 15px;
+  overflow-y: auto; /* Scroll vertical dentro del día */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* --- TARJETA DE EJERCICIO INDIVIDUAL (RECUADRO) --- */
+.exercise-box-card {
+  background-color: #ffffff;
+  border: 2px solid #253237;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: transform 0.1s;
+}
+
+.exercise-box-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Cabecera de la tarjeta (Nombre del ejercicio y botón borrar) */
+.exercise-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #9DB4C0;
+  padding-bottom: 8px;
+  gap: 5px;
+}
+
+.ex-name-input {
+  background: transparent;
+  border: none;
+  color: #253237;
+  font-weight: 800;
+  font-size: 1rem;
+  width: 100%;
+  font-family: inherit;
+}
+.ex-name-input:focus { border-bottom: 2px solid #253237; outline: none; }
+.ex-name-input:disabled { color: #253237; cursor: default; background: transparent; border:none;}
+
+.btn-remove-icon {
+  background: #e63946;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Stats Grid (Sets, Reps, Peso) */
+.exercise-box-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-item label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #5C6B73;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.stat-item input {
+  width: 100%;
+  background-color: #E0FBFC;
+  border: 1px solid #9DB4C0;
+  border-radius: 6px;
+  color: #253237;
+  text-align: center;
+  padding: 6px;
+  font-weight: 600;
+}
+.stat-item input:focus { border-color: #253237; background-color: #fff; outline: none; }
+.stat-item input:disabled { background-color: #f0f0f0; color: #555; }
+
+/* Botón Añadir Ejercicio (Estilo "Ghost") */
+.btn-add-card {
+  width: 100%;
+  background-color: transparent;
+  border: 2px dashed #253237;
+  color: #253237;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.btn-add-card:hover { background-color: #253237; color: #E0FBFC; }
+
+
+/* =========================================
+   5. FOOTER DEL MODAL
+   ========================================= */
+
+.modal-footer-actions {
+  padding: 20px 30px;
+  border-top: 2px solid #253237;
+  background-color: #9DB4C0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  color: #253237;
+  border: 2px solid #253237;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.btn-cancel:hover { background-color: rgba(37, 50, 55, 0.1); }
+
+.btn-save-main {
+  background-color: #253237;
+  color: #E0FBFC;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+.btn-save-main:hover {
+    transform: translateY(-2px);
+    background-color: #1a2428;
+}
+
+
+/* =========================================
+   6. RESPONSIVE
    ========================================= */
 
 @media (max-width: 768px) {
-  .rutinas-container {
-      padding-top: 80px; /* Menos padding arriba en móvil */
+  .rutinas-container { padding-top: 80px; padding-left: 10px; padding-right: 10px;}
+  
+  .modal-content.wide-modal {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
   }
 
-  .modal-content {
-      padding: 15px; /* Menos padding interno */
-      width: 95%;
-  }
-
-  .form-row {
-      flex-direction: column; /* Nombre rutina y Días uno debajo de otro */
+  .form-top-bar {
+      flex-direction: column;
       gap: 10px;
-  }
-
-  /* Ocultar la fila de encabezados (Texto: Ejercicio, Series...) en móvil 
-     porque ya usaremos los placeholders y el formato apilado */
-  .day-section .exercise-row:first-of-type {
-      display: none;
-  }
-
-  /* Transformar la fila de ejercicio en móvil */
-  .exercise-row {
-      grid-template-columns: 1fr 1fr 1fr auto; /* 3 columnas para números + 1 para borrar */
-      gap: 10px;
-      padding: 15px 10px;
-  }
-
-  /* El Input del NOMBRE del ejercicio ocupa todo el ancho (fila de arriba) */
-  .exercise-row input:nth-child(1) {
-      grid-column: 1 / -1; /* Va de la columna 1 a la última */
-      text-align: left;
-      margin-bottom: 5px;
-      font-weight: bold;
-  }
-
-  /* Los inputs de números (Series, Reps, Peso) se quedan en la fila de abajo */
-  .exercise-row input:not(:first-child) {
-      padding: 8px 5px; /* Un poco más pequeños */
-      font-size: 0.9rem;
   }
   
-  /* El botón de eliminar se ajusta */
-  .btn-remove {
-      font-size: 1.5rem;
-      padding: 0 5px;
+  .form-group.small-group { flex: auto; }
+
+  /* En móvil, en lugar de scroll horizontal, que se apilen verticalmente */
+  .exercises-scroll-container {
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 15px;
+  }
+
+  .day-column {
+      min-width: 100%;
+      max-width: 100%;
+      height: auto; /* Altura automática en móvil */
+  }
+
+  .day-exercises-list {
+      max-height: 300px; /* Limitar altura interna si se apilan */
   }
 }

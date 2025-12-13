@@ -1,170 +1,164 @@
 // backend/db/sequelize.js
+
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const dotenv = require('dotenv');
-const sqlite3 = require('@libsql/sqlite3');
+// Ya NO se requiere: const sqlite3 = require('@libsql/sqlite3');
+// Ya NO se requiere: el parche de customDriver
 
 dotenv.config();
 
-// --- PARCHE "NUCLEAR" PARA TURSO + SEQUELIZE ---
-// Función helper para descongelar objetos de forma agresiva
-const deepUnfreeze = (data) => {
-    if (!data) return data;
-    try {
-        // Copia profunda usando JSON.parse/stringify para eliminar cualquier referencia de solo lectura
-        return JSON.parse(JSON.stringify(data));
-    } catch (e) {
-        return data; // Fallback por si acaso
+// --- 1. CONFIGURACIÓN DE CONEXIÓN A MYSQL ---
+
+console.log("🚀 Conectando a MySQL Local...");
+
+const sequelize = new Sequelize(
+    process.env.DB_NAME,       // Nombre de la BD (requiere .env actualizado)
+    process.env.DB_USER,       // Usuario
+    process.env.DB_PASSWORD,   // Contraseña
+    {
+        host: process.env.DB_HOST || 'localhost',
+        dialect: 'mysql', // <-- CAMBIO CLAVE: Usar dialecto MySQL
+        dialectModule: require('mysql2'), // <-- Usar el paquete que instalaste
+        logging: false, // Puedes cambiar a console.log para debugging SQL
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 30000,
+            idle: 10000
+        },
+        define: {
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_unicode_ci'
+        }
     }
-};
+);
 
-// Creamos un driver personalizado que envuelve al original
-const customDriver = {
-    ...sqlite3,
-    Database: function(filename, mode, callback) {
-        // Forzamos la conexión real a la URL de Turso
-        const realUrl = process.env.TURSO_CONNECTION_URL;
-        const db = new sqlite3.Database(realUrl, mode, callback);
+// --- 2. MODELOS (Se mantienen intactos, solo cambian los tipos nativos que MySQL maneja) ---
 
-        // 1. Interceptamos db.all (Consultas directas)
-        const originalDbAll = db.all;
-        db.all = function(sql, ...args) {
-            const lastArg = args[args.length - 1];
-            if (typeof lastArg === 'function') {
-                const originalCallback = lastArg;
-                // Reemplazamos el callback original
-                args[args.length - 1] = (err, rows) => {
-                    if (rows) rows = deepUnfreeze(rows); // <--- DESCONGELAR
-                    originalCallback(err, rows);
-                };
-            }
-            return originalDbAll.apply(this, [sql, ...args]);
-        };
-
-        // 2. Interceptamos db.get (Consultas de una fila)
-        const originalDbGet = db.get;
-        db.get = function(sql, ...args) {
-            const lastArg = args[args.length - 1];
-            if (typeof lastArg === 'function') {
-                const originalCallback = lastArg;
-                args[args.length - 1] = (err, row) => {
-                    if (row) row = deepUnfreeze(row); // <--- DESCONGELAR
-                    originalCallback(err, row);
-                };
-            }
-            return originalDbGet.apply(this, [sql, ...args]);
-        };
-
-        // 3. Interceptamos db.prepare (Sentencias preparadas)
-        const originalPrepare = db.prepare;
-        db.prepare = function(sql, ...args) {
-            const stmt = originalPrepare.apply(this, [sql, ...args]);
-
-            // 3a. Interceptamos stmt.all
-            const originalStmtAll = stmt.all;
-            stmt.all = function(...sArgs) {
-                const lastArg = sArgs[sArgs.length - 1];
-                if (typeof lastArg === 'function') {
-                    const cb = lastArg;
-                    sArgs[sArgs.length - 1] = (err, rows) => {
-                        if (rows) rows = deepUnfreeze(rows); // <--- DESCONGELAR
-                        cb(err, rows);
-                    };
-                }
-                return originalStmtAll.apply(this, sArgs);
-            };
-
-            // 3b. Interceptamos stmt.get
-            const originalStmtGet = stmt.get;
-            stmt.get = function(...sArgs) {
-                const lastArg = sArgs[sArgs.length - 1];
-                if (typeof lastArg === 'function') {
-                    const cb = lastArg;
-                    sArgs[sArgs.length - 1] = (err, row) => {
-                        if (row) row = deepUnfreeze(row); // <--- DESCONGELAR
-                        cb(err, row);
-                    };
-                }
-                return originalStmtGet.apply(this, sArgs);
-            };
-
-            return stmt;
-        };
-
-        return db;
-    }
-};
-
-console.log("🚀 Conectando a Turso (Modo: Parche Completo)...");
-
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  dialectModule: customDriver, 
-  storage: ':memory:', // Dummy para Windows
-  logging: false,
-  pool: {
-    max: 5,
-    min: 0,
-    idle: 10000
-  }
-});
-
-// --- MODELOS ---
+// Modelo User (Usuario)
 const User = sequelize.define('User', { 
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  username: { type: DataTypes.STRING, allowNull: false, unique: true },
-  email: { type: DataTypes.STRING, allowNull: false, unique: true },
-  password: { type: DataTypes.STRING, allowNull: false } 
-}, { freezeTableName: true });
+    id: { 
+        type: DataTypes.INTEGER, 
+        autoIncrement: true, 
+        primaryKey: true 
+    },
+    username: { 
+        type: DataTypes.STRING, 
+        allowNull: false, 
+        unique: true 
+    },
+    email: { 
+        type: DataTypes.STRING, 
+        allowNull: false, 
+        unique: true, 
+        validate: { isEmail: true } 
+    },
+    genero: { 
+        type: DataTypes.BOOLEAN, // MySQL lo manejará como TINYINT(1)
+        allowNull: true 
+    },
+    anioNacimiento: { 
+        type: DataTypes.INTEGER, 
+        allowNull: true 
+    },
+    estatura: { 
+        type: DataTypes.DOUBLE, 
+        allowNull: true 
+    },
+    peso: { 
+        type: DataTypes.DOUBLE, 
+        allowNull: true 
+    },
+    contrasena: { 
+        type: DataTypes.STRING, 
+        allowNull: false, 
+        validate: { len: [6, 255] } 
+    } 
+}, { freezeTableName: true, tableName: 'Usuario' });
 
+
+// Modelo Routine (Rutina)
 const Routine = sequelize.define('Routine', { 
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  name: { type: DataTypes.STRING, allowNull: false },
-  focus: DataTypes.STRING,
-  duration: DataTypes.STRING,
-  isDefault: { type: DataTypes.BOOLEAN, defaultValue: false } 
-}, { freezeTableName: true });
+    id: { 
+        type: DataTypes.INTEGER, 
+        autoIncrement: true, 
+        primaryKey: true 
+    },
+    nombre: { 
+        type: DataTypes.STRING, 
+        allowNull: false 
+    },
+    esPredeterminada: { 
+        type: DataTypes.BOOLEAN, 
+        defaultValue: false 
+    } 
+}, { freezeTableName: true, tableName: 'Rutina' });
 
+
+// Modelo Exercise (Ejercicio)
 const Exercise = sequelize.define('Exercise', { 
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  name: { type: DataTypes.STRING, allowNull: false },
-  sets: { type: DataTypes.INTEGER, allowNull: false },
-  reps: { type: DataTypes.INTEGER, allowNull: false },
-  weight: { type: DataTypes.FLOAT, defaultValue: 0 },
-  day: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 }
-}, { freezeTableName: true });
+    id: { 
+        type: DataTypes.INTEGER, 
+        autoIncrement: true, 
+        primaryKey: true 
+    },
+    nombre: { 
+        type: DataTypes.STRING, 
+        allowNull: false 
+    },
+    dia: { 
+        type: DataTypes.STRING, 
+        allowNull: false, 
+        defaultValue: 'Lunes' 
+    }
+}, { freezeTableName: true, tableName: 'Ejercicio' });
 
-// --- RELACIONES ---
-User.hasMany(Routine); 
-Routine.belongsTo(User); 
-Routine.hasMany(Exercise, { onDelete: 'CASCADE' }); 
-Exercise.belongsTo(Routine);
 
-// En backend/db/sequelize.js
+// Modelo Set (Serie)
+const Set = sequelize.define('Set', {
+    id: { 
+        type: DataTypes.INTEGER, 
+        autoIncrement: true, 
+        primaryKey: true 
+    },
+    repeticiones: { 
+        type: DataTypes.INTEGER, 
+        allowNull: false, 
+        defaultValue: 0 
+    },
+    peso: { 
+        type: DataTypes.FLOAT, // Usamos FLOAT para mayor precisión que DOUBLE si no es necesario
+        defaultValue: 0 
+    }
+}, { freezeTableName: true, tableName: 'Set', timestamps: false });
+
+
+// --- 3. RELACIONES (Se mantienen correctas) ---
+User.hasMany(Routine, { foreignKey: 'UsuarioId' }); 
+Routine.belongsTo(User, { foreignKey: 'UsuarioId' }); 
+
+Routine.hasMany(Exercise, { onDelete: 'CASCADE', foreignKey: 'RutinaId' }); 
+Exercise.belongsTo(Routine, { foreignKey: 'RutinaId' });
+
+Exercise.hasMany(Set, { onDelete: 'CASCADE', foreignKey: 'EjercicioId' }); 
+Set.belongsTo(Exercise, { foreignKey: 'EjercicioId' });
+
 
 const connectDB = async () => {
     try {
         await sequelize.authenticate();
-        console.log('✅ Conexión a Turso establecida.');
+        console.log('✅ Conexión a MySQL establecida.');
         
-        // 1. Desactivar claves foráneas para poder tocar las tablas sin errores
-        await sequelize.query('PRAGMA foreign_keys = OFF;');
-
-        // 2. LIMPIEZA PREVENTIVA: Borrar cualquier tabla backup que se haya quedado "colgada"
-        // Esto es lo que arregla tu error actual y futuros
-        await sequelize.query('DROP TABLE IF EXISTS `User_backup`;');
-        await sequelize.query('DROP TABLE IF EXISTS `Routine_backup`;');
-        await sequelize.query('DROP TABLE IF EXISTS `Exercise_backup`;');
-
-        // 3. Sincronizar (alter: true intentará ajustar las tablas sin borrar datos)
-        await sequelize.sync({ force: false }); 
-
-        // 4. Reactivar claves foráneas
-        await sequelize.query('PRAGMA foreign_keys = ON;');
+        // Ya no necesitamos las consultas PRAGMA ni las limpiezas de tablas backup
+        // MySQL es más estable con { force: false, alter: true }
+        await sequelize.sync({ force: false, alter: true }); 
 
         console.log('✅ Tablas sincronizadas correctamente.');
     } catch (error) {
-        console.error('❌ Error crítico en la conexión:', error);
+        // En MySQL, los errores de conexión se verán como "Access denied" o "Unknown database"
+        console.error('❌ Error crítico: Falló la conexión o la sincronización con MySQL.');
+        console.error('Detalles:', error.message);
     }
 };
 
-module.exports = { sequelize, User, Routine, Exercise, connectDB, Op };
+module.exports = { sequelize, User, Routine, Exercise, Set, connectDB, Op };

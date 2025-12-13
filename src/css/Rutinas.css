@@ -154,7 +154,7 @@
 
 .btn-view { background-color: #3d5a80; color: white; }
 .btn-edit { background-color: #253237; color: #E0FBFC; }
-.btn-customize { background-color: #5C6B73; color: white; }
+.btn-customize { background-color: #ee9b00; color: #253237; }
 .btn-delete { background: #e63946; color: white; flex: 0; min-width: auto; padding: 8px 15px;}
 
 
@@ -170,6 +170,7 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(5px);
 }
 
@@ -360,40 +361,6 @@
   align-items: center;
 }
 
-/* Stats Grid (Sets, Reps, Peso) */
-.exercise-box-stats {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stat-item label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: #5C6B73;
-  margin-bottom: 2px;
-  font-weight: bold;
-}
-
-.stat-item input {
-  width: 100%;
-  background-color: #E0FBFC;
-  border: 1px solid #9DB4C0;
-  border-radius: 6px;
-  color: #253237;
-  text-align: center;
-  padding: 6px;
-  font-weight: 600;
-}
-.stat-item input:focus { border-color: #253237; background-color: #fff; outline: none; }
-.stat-item input:disabled { background-color: #f0f0f0; color: #555; }
-
 /* Botón Añadir Ejercicio (Estilo "Ghost") */
 .btn-add-card {
   width: 100%;
@@ -491,4 +458,103 @@
   .day-exercises-list {
       max-height: 300px; /* Limitar altura interna si se apilan */
   }
+}
+
+/* =========================================
+   7. ESTILOS PARA LAS SERIES (NUEVO)
+   ========================================= */
+
+.series-container {
+  margin-top: 12px;
+  background-color: #f0f8fa; /* Un fondo muy suave para diferenciar la zona de series */
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e1e4e8;
+}
+
+.series-labels {
+  display: grid;
+  grid-template-columns: 30px 1fr 1fr 30px; /* Columnas alineadas: #, Reps, Kg, Delete */
+  font-size: 0.75rem;
+  color: #5C6B73;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.series-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 1fr 30px;
+  gap: 8px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.serie-index {
+  text-align: center;
+  color: #253237;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.series-row input {
+  width: 100%;
+  padding: 6px;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: #253237;
+  font-weight: 600;
+}
+
+.series-row input:focus {
+  border-color: #253237;
+  box-shadow: 0 0 0 1px rgba(37, 50, 55, 0.2);
+  outline: none;
+}
+
+/* Botón rojo pequeño para quitar una serie */
+.btn-remove-serie {
+  background-color: #ffecec;
+  color: #d32f2f;
+  border: 1px solid #ffcdd2;
+  border-radius: 50%; /* Círculo */
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.btn-remove-serie:hover {
+  background-color: #ffcdd2;
+}
+
+/* Botón ancho para añadir nueva serie */
+.btn-add-serie {
+  width: 100%;
+  margin-top: 5px;
+  background-color: #e2e6ea;
+  border: 1px dashed #ccc;
+  color: #495057;
+  font-size: 0.8rem;
+  padding: 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+.btn-add-serie:hover {
+  background-color: #d3d9df;
+  color: #212529;
+  border-color: #adb5bd;
 }

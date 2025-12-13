@@ -6,18 +6,34 @@ const { User } = require('../db/sequelize');
 
 // REGISTRO (/api/auth/register)
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, 
+    email, 
+    contrasena, // La contraseña
+    genero,  
+    anioNacimiento, 
+    estatura, 
+    peso 
+  } = req.body;
   
   console.log("📩 [REGISTER] Datos recibidos:", { username, email }); // Log 1
 
+  if (!contrasena) {
+    console.error("❌ [REGISTER] Falta el campo 'contrasena' en req.body.");
+    return res.status(400).json({ msg: "La contraseña es un campo obligatorio." });
+  }
+
   try {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(contrasena, salt);
 
     const newUser = await User.create({
       username,
       email,
-      password: hashedPassword,
+      contrasena: hashedPassword,
+      genero, 
+      anioNacimiento,
+      estatura,
+      peso,
     });
 
     console.log("✅ [REGISTER] Usuario creado con ID:", newUser.id); // Log 2

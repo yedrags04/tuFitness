@@ -14,12 +14,18 @@ const Rutinas = () => {
 
   const navigate = useNavigate();
 
+  // ESTADO INICIAL: Estructura jerárquica -> Día > Ejercicio > Series
   const initialRoutineState = {
     name: '',
     dayCount: 1,
     duration: '',
     daysData: [
-        { dayNumber: 1, exercises: [{ name: '', sets: '', reps: '', weight: '' }] }
+        { 
+            dayNumber: 1, 
+            exercises: [
+                { name: '', series: [{ reps: '', weight: '' }] } 
+            ] 
+        }
     ]
   };
 
@@ -42,9 +48,26 @@ const Rutinas = () => {
   };
 
   useEffect(() => {
-    fetchRoutines();
-  }, [navigate]);
+    const fetchRoutines = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return navigate('/iniciar-sesion');
 
+      try {
+        const res = await axios.get('http://localhost:5000/api/routines', {
+          headers: { 'x-auth-token': token },
+        });
+        const allRoutines = res.data;
+        setMisRutinas(allRoutines.filter(r => !r.isDefault));
+        setRutinasPredeterminadas(allRoutines.filter(r => r.isDefault));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchRoutines();
+  }, [navigate]); // navigate es estable, así que está bien aquí
+
+  // --- HELPER: Mapear datos de la Base de Datos al Formulario ---
   const mapRoutineToForm = (routine) => {
     const currentExercises = routine.exercises || routine.Exercises || [];
     
@@ -58,15 +81,38 @@ const Rutinas = () => {
     for (let i = 1; i <= maxDay; i++) {
         const exercisesForDay = currentExercises
             .filter(ex => (ex.day || 1) === i)
-            .map(ex => ({
-                name: ex.name,
-                sets: ex.sets,
-                reps: ex.reps,
-                weight: ex.weight
-            }));
+            .map(ex => {
+                // 1. Buscamos las series (Sets) que vienen de la BD
+                // Sequelize suele devolverlas en la propiedad 'Sets' (mayúscula) o 'sets'
+                const setsFromDB = ex.Sets || ex.sets || [];
+
+                // 2. Mapeamos a nuestro formato visual
+                let seriesFormatted = setsFromDB.map(s => ({
+                    reps: s.reps,
+                    weight: s.weight
+                }));
+
+                // Si es un ejercicio antiguo sin series o viene vacío, ponemos una por defecto
+                if (seriesFormatted.length === 0) {
+                    // Intentamos rescatar datos antiguos si existieran en el ejercicio padre (fallback)
+                    if (ex.reps || ex.weight) {
+                         const setsCount = ex.sets || 1;
+                         for(let k=0; k<setsCount; k++) {
+                             seriesFormatted.push({ reps: ex.reps, weight: ex.weight });
+                         }
+                    } else {
+                        seriesFormatted.push({ reps: '', weight: '' });
+                    }
+                }
+
+                return {
+                    name: ex.name,
+                    series: seriesFormatted
+                };
+            });
         
         if (exercisesForDay.length === 0) {
-            exercisesForDay.push({ name: '', sets: '', reps: '', weight: '' });
+            exercisesForDay.push({ name: '', series: [{ reps: '', weight: '' }] });
         }
 
         reconstructedDays.push({
@@ -84,40 +130,17 @@ const Rutinas = () => {
   };
 
   // --- HANDLERS ---
-  const handleEditClick = (routine) => {
-    setNewRoutine(mapRoutineToForm(routine));
-    setEditingId(routine._id || routine.id);
-    setModalMode('edit');
-    setShowModal(true);
-  };
-
-  const handleAdjustClick = (routine) => {
-    setNewRoutine(mapRoutineToForm(routine));
-    setEditingId(routine._id || routine.id);
-    setModalMode('adjust');
-    setShowModal(true);
-  };
-
-  const handleViewDefault = (routine) => {
-    setNewRoutine(mapRoutineToForm(routine));
-    setEditingId(null); 
-    setModalMode('view');
-    setShowModal(true);
-  };
-
-  const handleCustomizeDefault = (routine) => {
-    const formData = mapRoutineToForm(routine);
-    formData.name = `${formData.name} (Copia)`;
-    setNewRoutine(formData);
-    setEditingId(null);
-    setModalMode('customize');
-    setShowModal(true);
-  };
-
-  const handleCreateClick = () => {
-    setEditingId(null);
-    setNewRoutine(initialRoutineState);
-    setModalMode('create');
+  const openModal = (routine, mode) => {
+    if (routine) {
+        const formData = mapRoutineToForm(routine);
+        if (mode === 'customize') formData.name += ' (Copia)';
+        setNewRoutine(formData);
+        setEditingId(mode === 'edit' || mode === 'adjust' ? (routine._id || routine.id) : null);
+    } else {
+        setNewRoutine(initialRoutineState);
+        setEditingId(null);
+    }
+    setModalMode(mode);
     setShowModal(true);
   };
 
@@ -128,6 +151,7 @@ const Rutinas = () => {
     setModalMode('create');
   };
 
+  // Cambiar datos generales (Nombre rutina, dias, duracion)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === 'dayCount') {
@@ -136,7 +160,10 @@ const Rutinas = () => {
             const newDays = [...prev.daysData];
             if (count > newDays.length) {
                 for (let i = newDays.length + 1; i <= count; i++) {
-                    newDays.push({ dayNumber: i, exercises: [{ name: '', sets: '', reps: '', weight: '' }] });
+                    newDays.push({ 
+                        dayNumber: i, 
+                        exercises: [{ name: '', series: [{ reps: '', weight: '' }] }] 
+                    });
                 }
             } else {
                 newDays.length = count;
@@ -148,15 +175,51 @@ const Rutinas = () => {
     }
   };
 
-  const handleExerciseChange = (dayIndex, exerciseIndex, field, value) => {
+  // Cambiar el nombre del ejercicio
+  const handleExerciseNameChange = (dayIndex, exIndex, value) => {
     const updatedDays = [...newRoutine.daysData];
-    updatedDays[dayIndex].exercises[exerciseIndex][field] = value;
+    updatedDays[dayIndex].exercises[exIndex].name = value;
     setNewRoutine({ ...newRoutine, daysData: updatedDays });
+  };
+
+  // --- NUEVO: Cambiar datos de una SERIE específica ---
+  const handleSerieChange = (dayIndex, exIndex, serieIndex, field, value) => {
+    const updatedDays = [...newRoutine.daysData];
+    updatedDays[dayIndex].exercises[exIndex].series[serieIndex][field] = value;
+    setNewRoutine({ ...newRoutine, daysData: updatedDays });
+  };
+
+  // --- NUEVO: Añadir una nueva Serie ---
+  const addSerie = (dayIndex, exIndex) => {
+    const updatedDays = [...newRoutine.daysData];
+    const currentSeries = updatedDays[dayIndex].exercises[exIndex].series;
+    
+    // Copiamos los valores de la última serie para facilitar la entrada de datos
+    const lastSerie = currentSeries[currentSeries.length - 1];
+    const newSerie = { 
+        reps: lastSerie ? lastSerie.reps : '', 
+        weight: lastSerie ? lastSerie.weight : '' 
+    };
+
+    currentSeries.push(newSerie);
+    setNewRoutine({ ...newRoutine, daysData: updatedDays });
+  };
+
+  // --- NUEVO: Eliminar una Serie ---
+  const removeSerie = (dayIndex, exIndex, serieIndex) => {
+    const updatedDays = [...newRoutine.daysData];
+    const currentSeries = updatedDays[dayIndex].exercises[exIndex].series;
+
+    // No permitimos dejar un ejercicio con 0 series (mínimo 1)
+    if (currentSeries.length > 1) {
+        currentSeries.splice(serieIndex, 1);
+        setNewRoutine({ ...newRoutine, daysData: updatedDays });
+    }
   };
 
   const addExercise = (dayIndex) => {
     const updatedDays = [...newRoutine.daysData];
-    updatedDays[dayIndex].exercises.push({ name: '', sets: '', reps: '', weight: '' });
+    updatedDays[dayIndex].exercises.push({ name: '', series: [{ reps: '', weight: '' }] });
     setNewRoutine({ ...newRoutine, daysData: updatedDays });
   };
 
@@ -180,16 +243,16 @@ const Rutinas = () => {
     if (modalMode === 'view') return;
 
     const token = localStorage.getItem('token');
-    const flatExercises = [];
+    
+    // Preparamos la estructura completa (Rutina -> Ejercicios -> Series)
+    const formattedExercises = [];
     newRoutine.daysData.forEach(day => {
         day.exercises.forEach(ex => {
             if(ex.name && ex.name.trim() !== '') {
-                flatExercises.push({
+                formattedExercises.push({
                     name: ex.name,
-                    sets: parseInt(ex.sets) || 0, 
-                    reps: parseInt(ex.reps) || 0, 
-                    weight: parseFloat(ex.weight) || 0, 
-                    day: day.dayNumber
+                    day: day.dayNumber,
+                    series: ex.series // Enviamos el array de series
                 });
             }
         });
@@ -198,7 +261,7 @@ const Rutinas = () => {
     const payload = {
         name: newRoutine.name,
         duration: newRoutine.duration,
-        exercises: flatExercises
+        exercises: formattedExercises
     };
 
     try {
@@ -213,6 +276,7 @@ const Rutinas = () => {
         });
         alert("Rutina guardada en tu colección!");
       }
+      
       closeAndResetModal();
       fetchRoutines();
     } catch (err) {
@@ -227,7 +291,9 @@ const Rutinas = () => {
     <div className="rutinas-container">
       <div className="rutinas-header">
         <h2>Mis Rutinas</h2>
-        <button className="btn-crear" onClick={handleCreateClick}>+ Nueva Rutina</button>
+        <button className="btn-crear" onClick={() => openModal(null, 'create')}>
+          + Nueva Rutina
+        </button>
       </div>
 
       <div className="routines-grid">
@@ -240,8 +306,8 @@ const Rutinas = () => {
                  <span className="tag-day">{routine.exercises ? new Set(routine.exercises.map(e=>e.day)).size : 1} Días</span>
               </div>
               <div className="routine-actions">
-                 <button className="btn-view" onClick={() => handleAdjustClick(routine)}>Ver / Ajustar</button>
-                 <button className="btn-edit" onClick={() => handleEditClick(routine)}>Editar Todo</button>
+                 <button className="btn-view" onClick={() => openModal(routine, 'adjust')}>Ver / Ajustar</button>
+                 <button className="btn-edit" onClick={() => openModal(routine, 'edit')}>Editar Todo</button>
                  <button className="btn-delete" onClick={() => handleDelete(routine._id || routine.id)}>Borrar</button>
               </div>
             </div>
@@ -253,15 +319,14 @@ const Rutinas = () => {
 
       <hr className="divider" style={{margin:'40px 0', borderColor:'#333'}} />
       
-      <h2>Rutinas Recomendadas</h2>
+      <h2>Rutinas Predeterminadas</h2>
       <div className="routines-grid">
          {rutinasPredeterminadas.map((routine) => (
              <div className="routine-card default-card" key={routine._id || routine.id}>
                 <h3>{routine.name}</h3>
-                <p style={{fontSize:'0.9em', color:'#1d2122ff'}}>Duración: {routine.duration || 'N/A'}</p>
                 <div className="routine-actions">
-                    <button className="btn-view" onClick={() => handleViewDefault(routine)}>Ver</button>
-                    <button className="btn-customize" onClick={() => handleCustomizeDefault(routine)}>Personalizar</button>
+                    <button className="btn-view" onClick={() => openModal(routine, 'view')}>Ver</button>
+                    <button className="btn-customize" onClick={() => openModal(routine, 'customize')}>Personalizar</button>
                 </div>
              </div>
          ))}
@@ -273,11 +338,9 @@ const Rutinas = () => {
           <div className="modal-content wide-modal">
             <div className="modal-header">
                 <h2>
-                    {modalMode === 'create' && 'Crear Nueva Rutina'}
-                    {modalMode === 'edit' && 'Editar Rutina Completa'}
-                    {modalMode === 'view' && 'Detalles de Rutina'}
-                    {modalMode === 'customize' && 'Personalizar Rutina'}
-                    {modalMode === 'adjust' && 'Ajustar Pesos y Series'}
+                    {modalMode === 'create' ? 'Crear Nueva Rutina' : 
+                     modalMode === 'edit' ? 'Editar Rutina' :
+                     modalMode === 'view' ? 'Detalles' : 'Personalizar Rutina'}
                 </h2>
                 <button className="close-btn" onClick={closeAndResetModal}>×</button>
             </div>
@@ -324,51 +387,76 @@ const Rutinas = () => {
                             <div className="day-exercises-list">
                                 {day.exercises.map((exercise, exIndex) => (
                                     <div key={exIndex} className="exercise-box-card">
-                                        {/* Cabecera de la tarjeta del ejercicio */}
+                                        
+                                        {/* 1. Cabecera del Ejercicio (Nombre + Borrar Ejercicio) */}
                                         <div className="exercise-box-header">
                                             <input 
                                                 className="ex-name-input"
                                                 placeholder="Nombre Ejercicio" 
                                                 value={exercise.name} 
-                                                onChange={(e) => handleExerciseChange(dayIndex, exIndex, 'name', e.target.value)}
+                                                onChange={(e) => handleExerciseNameChange(dayIndex, exIndex, e.target.value)}
                                                 disabled={isStructureLocked}
-                                                title={exercise.name}
                                             />
                                             {!isStructureLocked && (
                                                 <button type="button" className="btn-remove-icon" onClick={() => removeExercise(dayIndex, exIndex)}>×</button>
                                             )}
                                         </div>
 
-                                        {/* Cuerpo de la tarjeta con los datos numéricos */}
-                                        <div className="exercise-box-stats">
-                                            <div className="stat-item">
-                                                <label>Sets</label>
-                                                <input 
-                                                    type="number"
-                                                    value={exercise.sets} 
-                                                    onChange={(e) => handleExerciseChange(dayIndex, exIndex, 'sets', e.target.value)}
-                                                    disabled={modalMode === 'view'} 
-                                                />
+                                        {/* 2. ZONA DE SERIES (Las cajitas numéricas) */}
+                                        <div className="series-container">
+                                            {/* Etiquetas de columnas */}
+                                            <div className="series-labels">
+                                                <span>#</span>
+                                                <span>Reps</span>
+                                                <span>Kg</span>
+                                                <span></span>
                                             </div>
-                                            <div className="stat-item">
-                                                <label>Reps</label>
-                                                <input 
-                                                    type="number"
-                                                    value={exercise.reps} 
-                                                    onChange={(e) => handleExerciseChange(dayIndex, exIndex, 'reps', e.target.value)}
-                                                    disabled={modalMode === 'view'} 
-                                                />
-                                            </div>
-                                            <div className="stat-item">
-                                                <label>Kg</label>
-                                                <input 
-                                                    type="number"
-                                                    value={exercise.weight} 
-                                                    onChange={(e) => handleExerciseChange(dayIndex, exIndex, 'weight', e.target.value)}
-                                                    disabled={modalMode === 'view'} 
-                                                />
-                                            </div>
+
+                                            {/* Filas de series */}
+                                            {exercise.series.map((serie, sIndex) => (
+                                                <div key={sIndex} className="series-row">
+                                                    <span className="serie-index">{sIndex + 1}</span>
+                                                    <input 
+                                                        type="number" 
+                                                        placeholder="0"
+                                                        value={serie.reps}
+                                                        onChange={(e) => handleSerieChange(dayIndex, exIndex, sIndex, 'reps', e.target.value)}
+                                                        disabled={modalMode === 'view'}
+                                                    />
+                                                    <input 
+                                                        type="number" 
+                                                        placeholder="0"
+                                                        value={serie.weight}
+                                                        onChange={(e) => handleSerieChange(dayIndex, exIndex, sIndex, 'weight', e.target.value)}
+                                                        disabled={modalMode === 'view'}
+                                                    />
+                                                    {/* Botón borrar serie individual */}
+                                                    {modalMode !== 'view' && (
+                                                        <button 
+                                                            type="button" 
+                                                            className="btn-remove-serie" 
+                                                            onClick={() => removeSerie(dayIndex, exIndex, sIndex)}
+                                                            title="Quitar serie"
+                                                        >
+                                                            -
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            ))}
+
+                                            {/* Botón añadir serie */}
+                                            {modalMode !== 'view' && (
+                                                <button 
+                                                    type="button" 
+                                                    className="btn-add-serie" 
+                                                    onClick={() => addSerie(dayIndex, exIndex)}
+                                                >
+                                                    + Añadir Serie
+                                                </button>
+                                            )}
                                         </div>
+                                        {/* Fin Zona Series */}
+
                                     </div>
                                 ))}
                                 

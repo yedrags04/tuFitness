@@ -72,7 +72,7 @@ const Rutinas = () => {
     const currentExercises = routine.exercises || routine.Exercises || [];
     
     if (!currentExercises || currentExercises.length === 0) {
-        return { ...initialRoutineState, name: routine.name, duration: routine.duration || '' };
+        return { ...initialRoutineState, name: routine.name || routine.nombre || '', duration: routine.duration || '' };
     }
 
     const maxDay = currentExercises.reduce((max, ex) => Math.max(max, ex.day || 1), 1);
@@ -82,34 +82,35 @@ const Rutinas = () => {
         const exercisesForDay = currentExercises
             .filter(ex => (ex.day || 1) === i)
             .map(ex => {
-                // 1. Buscamos las series (Sets) que vienen de la BD
-                // Sequelize suele devolverlas en la propiedad 'Sets' (mayúscula) o 'sets'
-                const setsFromDB = ex.Sets || ex.sets || [];
+                // 1. Buscamos las series (Sets). Usamos 'Sets' (el alias de Sequelize)
+                const setsFromDB = ex.Sets || ex.sets || []; // Dejo 'ex.sets' como fallback
 
-                // 2. Mapeamos a nuestro formato visual
-                let seriesFormatted = setsFromDB.map(s => ({
-                    reps: s.reps,
-                    weight: s.weight
-                }));
+                // 2. Mapeamos a nuestro formato visual
+                let seriesFormatted = setsFromDB.map(s => ({
+                    // 🛑 CLAVE 5 (FIX UNCONTROLLED): Usar 'repeticiones' y 'peso' y convertir a String
+                    reps: String(s.repeticiones !== undefined ? s.repeticiones : ''),
+                    weight: String(s.peso !== undefined ? s.peso : '')
+                }));
 
-                // Si es un ejercicio antiguo sin series o viene vacío, ponemos una por defecto
-                if (seriesFormatted.length === 0) {
-                    // Intentamos rescatar datos antiguos si existieran en el ejercicio padre (fallback)
-                    if (ex.reps || ex.weight) {
-                         const setsCount = ex.sets || 1;
-                         for(let k=0; k<setsCount; k++) {
-                             seriesFormatted.push({ reps: ex.reps, weight: ex.weight });
-                         }
-                    } else {
-                        seriesFormatted.push({ reps: '', weight: '' });
-                    }
-                }
+                // Si es un ejercicio antiguo sin series o viene vacío, ponemos una por defecto
+                if (seriesFormatted.length === 0) {
+                    // Intentamos rescatar datos antiguos si existieran en el ejercicio padre (fallback)
+                    if (ex.reps || ex.weight) {
+                         const setsCount = ex.sets || 1;
+                         for(let k=0; k<setsCount; k++) {
+                             seriesFormatted.push({ reps: String(ex.reps || ''), weight: String(ex.weight || '') });
+                         }
+                    } else {
+                        seriesFormatted.push({ reps: '', weight: '' });
+                    }
+                }
 
-                return {
-                    name: ex.name,
-                    series: seriesFormatted
-                };
-            });
+                return {
+                    // 🛑 CLAVE 6: Mapear 'nombre' de la BD a 'name' del estado
+                    name: ex.nombre || '', 
+                    series: seriesFormatted
+                };
+            });
         
         if (exercisesForDay.length === 0) {
             exercisesForDay.push({ name: '', series: [{ reps: '', weight: '' }] });
@@ -300,7 +301,7 @@ const Rutinas = () => {
         {misRutinas.length > 0 ? (
           misRutinas.map((routine) => (
             <div className="routine-card" key={routine._id || routine.id}>
-              <h3>{routine.name}</h3>
+              <h3>{routine.name || routine.nombre}</h3>
               <p style={{fontSize:'0.9em', color:'#1d2122ff'}}>Duración: {routine.duration || 'N/A'}</p>
               <div className="routine-tags">
                  <span className="tag-day">{routine.exercises ? new Set(routine.exercises.map(e=>e.day)).size : 1} Días</span>
@@ -323,7 +324,7 @@ const Rutinas = () => {
       <div className="routines-grid">
          {rutinasPredeterminadas.map((routine) => (
              <div className="routine-card default-card" key={routine._id || routine.id}>
-                <h3>{routine.name}</h3>
+                <h3>{routine.name || routine.nombre}</h3>
                 <div className="routine-actions">
                     <button className="btn-view" onClick={() => openModal(routine, 'view')}>Ver</button>
                     <button className="btn-customize" onClick={() => openModal(routine, 'customize')}>Personalizar</button>

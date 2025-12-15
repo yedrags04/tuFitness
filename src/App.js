@@ -1,13 +1,13 @@
 import './css/App.css';
-import { Routes, Route, Navigate } from 'react-router-dom'; // Importamos Navigate
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './Header'; 
 import Footer from './Footer'; 
 import Login from './Login';
 import Signup from './Signup';
 import HomeContent from './HomeContent'; 
 import Rutinas from './Rutinas';
-import EditarRutina from './EditarRutina'
-//import { useState } from 'react';
+import EditarRutina from './EditarRutina';
+import Perfil from './Perfil'; // <--- 1. IMPORTAR AQUÍ
 
 function App() {
   // Verificamos si hay un usuario guardado en localStorage
@@ -29,10 +29,18 @@ function App() {
             path="/rutinas" 
             element={user ? <Rutinas /> : <Navigate to="/iniciar-sesion" />} 
           />
+          
           <Route 
             path="/EditarRutina" 
             element={user ? <EditarRutina /> : <Navigate to="/iniciar-sesion" />} 
           />
+
+          {/* --- 2. NUEVA RUTA PROTEGIDA PARA PERFIL --- */}
+          <Route 
+            path="/perfil" 
+            element={user ? <Perfil /> : <Navigate to="/iniciar-sesion" />} 
+          />
+
         </Routes>
       </main>
       <Footer />

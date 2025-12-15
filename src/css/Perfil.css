@@ -1,0 +1,314 @@
+/* =========================================
+   1. CONTENEDOR GENERAL
+   ========================================= */
+.profile-container {
+  background-color: #E0FBFC;
+  min-height: 100vh;
+  padding: 100px 20px 50px; /* Padding superior para evitar el navbar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #253237;
+}
+
+.profile-header h2 {
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #253237;
+  margin-bottom: 40px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* =========================================
+   2. TARJETA PRINCIPAL (WRAPPER)
+   ========================================= */
+.profile-card-wrapper {
+  display: flex;
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 900px;
+  border-radius: 20px;
+  border: 3px solid #253237;
+  /* Sombra dura característica de tu diseño */
+  box-shadow: 12px 12px 0px rgba(37, 50, 55, 1);
+  overflow: hidden; /* Para que el sidebar no se salga del borde redondeado */
+  transition: transform 0.3s;
+}
+
+/* Efecto sutil al cargar */
+.profile-card-wrapper:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================================
+   3. SIDEBAR (IZQUIERDA - AVATAR)
+   ========================================= */
+.profile-sidebar {
+  background-color: #9DB4C0; /* Color secundario */
+  width: 300px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-right: 3px solid #253237;
+}
+
+.avatar-circle {
+  width: 120px;
+  height: 120px;
+  background-color: #253237;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border: 4px solid #E0FBFC;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.avatar-circle span {
+  font-size: 3.5rem;
+  color: #E0FBFC;
+  font-weight: 800;
+}
+
+.sidebar-name {
+  margin: 10px 0 5px;
+  font-size: 1.5rem;
+  color: #253237;
+}
+
+.sidebar-email {
+  margin: 0 0 30px;
+  font-size: 0.9rem;
+  color: #E0FBFC; /* Contraste sobre fondo gris azulado */
+  font-weight: 600;
+}
+
+/* Caja de estadística IMC */
+.stat-box {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 15px 25px;
+  border-radius: 10px;
+  border: 2px solid #253237;
+  margin-bottom: auto; /* Empuja el botón logout hacia abajo */
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.stat-value {
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #253237;
+}
+
+.btn-logout {
+  width: 100%;
+  padding: 12px;
+  background-color: #e63946; /* Rojo alerta */
+  color: white;
+  border: 2px solid #253237;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 30px;
+}
+
+.btn-logout:hover {
+  background-color: #d32f2f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+
+/* =========================================
+   4. DETALLES (DERECHA - FORMULARIO)
+   ========================================= */
+.profile-details {
+  flex: 1; /* Ocupa el resto del espacio */
+  padding: 40px;
+  background-color: #ffffff;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #E0FBFC;
+  padding-bottom: 15px;
+}
+
+.details-header h3 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #253237;
+}
+
+/* Botones de acción superior */
+.btn-edit-profile {
+  background: #ee9b00; /* Naranja */
+  border: 2px solid #253237;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #253237;
+  transition: transform 0.1s;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-save-edit {
+  background: #253237;
+  color: #E0FBFC;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-cancel-edit {
+  background: transparent;
+  color: #e63946;
+  border: 2px solid #e63946;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Estilos del Formulario */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group-profile {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group-profile {
+  flex: 1;
+}
+
+.form-group-profile label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #5C6B73;
+  margin-bottom: 6px;
+}
+
+.form-group-profile input,
+.form-group-profile select {
+  padding: 12px;
+  border: 2px solid #9DB4C0;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #253237;
+  background-color: #fcfdfd;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.form-group-profile input:focus,
+.form-group-profile select:focus {
+  outline: none;
+  border-color: #253237;
+  background-color: #fff;
+}
+
+/* Estado Deshabilitado (Vista) */
+.form-group-profile input:disabled,
+.form-group-profile select:disabled {
+  background-color: transparent;
+  border: 2px solid transparent; /* Sin borde para parecer texto plano */
+  border-bottom: 1px solid #ddd; /* Solo una línea sutil */
+  border-radius: 0;
+  padding-left: 0;
+  color: #253237;
+  font-weight: 600;
+  cursor: default;
+  -webkit-appearance: none; /* Quitar flecha del select en modo vista */
+  appearance: none;
+}
+
+/* Excepción para el email bloqueado siempre */
+.input-disabled {
+  color: #999 !important;
+  font-style: italic;
+}
+
+/* =========================================
+   5. RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .profile-card-wrapper {
+    flex-direction: column;
+    box-shadow: 6px 6px 0px rgba(37, 50, 55, 1);
+  }
+
+  .profile-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #253237;
+    flex-direction: row; /* En móvil, avatar y nombre lado a lado */
+    justify-content: space-between;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+
+  .avatar-circle {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0;
+  }
+
+  .avatar-circle span {
+    font-size: 2rem;
+  }
+  
+  .sidebar-name, .sidebar-email {
+    text-align: left;
+    margin-left: 15px;
+  }
+  
+  /* Ocultamos cosas menos importantes en header móvil */
+  .stat-box {
+    display: none; 
+  }
+
+  .btn-logout {
+    margin-top: 15px;
+    padding: 8px;
+  }
+
+  .profile-details {
+    padding: 25px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

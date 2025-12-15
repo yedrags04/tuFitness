@@ -1,21 +1,18 @@
-import React, {useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import logo from './img/logo192.png'; 
-import { Link } from 'react-router-dom'; // Importamos useNavigate
+import { Link } from 'react-router-dom'; 
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null); // 1. Estado para saber si hay usuario
+  const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
-  //const navigate = useNavigate();
 
-  // Al cargar el Header, revisamos si hay sesión guardada
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
 
-    // Tu lógica del menú dropdown
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -31,14 +28,11 @@ function Header() {
     setIsOpen(false);
   };
 
-  // 2. Función para Cerrar Sesión
   const handleLogout = () => {
-    localStorage.removeItem("user");  // Borrar usuario
-    localStorage.removeItem("token"); // Borrar token
-    setUser(null);                    // Limpiar estado local
-    setIsOpen(false);                 // Cerrar menú si está abierto
-    
-    // Redirigir al inicio y recargar para limpiar cualquier dato en memoria
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    setIsOpen(false);
     window.location.href = "/"; 
   };
 
@@ -58,14 +52,19 @@ function Header() {
               Inicio
             </Link>
             
-            {/* Solo mostramos enlace a Rutinas si está logueado */}
+            {/* Si hay usuario, mostramos Rutinas y Perfil */}
             {user && (
+              <>
                 <Link to="/rutinas" className="dropdown-link" onClick={closeMenu}>
-                Rutinas
+                  Rutinas
                 </Link>
+                {/* --- NUEVO: Enlace al Perfil en el menú --- */}
+                <Link to="/perfil" className="dropdown-link" onClick={closeMenu}>
+                  Mi Perfil
+                </Link>
+              </>
             )}
             
-            {/* Solo mostramos Registrarse si NO está logueado */}
             {!user && (
                 <Link to="/registrarse" className="dropdown-link" onClick={closeMenu}>
                 Registrarse
@@ -80,24 +79,38 @@ function Header() {
       </div>
       
       <nav>
-        {/* 3. Renderizado Condicional del Botón */}
         {user ? (
-            // Si hay usuario -> Botón de Cerrar Sesión
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px'}}>
-                {/* Opcional: Mostrar nombre del usuario */}
-                <span style={{ color: 'white', fontSize: '14px', marginRight: '10px', display: window.innerWidth > 600 ? 'block' : 'none' }}>
-                    Hola, {user.username}
-                </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px'}}>
+                
+                {/* --- NUEVO: El saludo ahora es un Link al Perfil --- */}
+                {/* Se oculta en móviles muy pequeños para no saturar */}
+                <Link 
+                  to="/perfil" 
+                  style={{ 
+                    textDecoration: 'none', 
+                    color: 'white', 
+                    fontSize: '14px', 
+                    fontWeight: 'bold',
+                    display: window.innerWidth > 600 ? 'flex' : 'none',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                  title="Ir a mi perfil"
+                >
+                    <span>Hola, {user.username}</span>
+                    {/* Un pequeño icono de usuario opcional */}
+                    <span style={{fontSize: '1.2rem'}}>👤</span>
+                </Link>
+
                 <button 
                     onClick={handleLogout} 
                     className="login-button"
-                    style={{ cursor: 'pointer', fontSize: '1rem' }} // Asegurar que parezca clickeable
+                    style={{ cursor: 'pointer', fontSize: '0.9rem' }} 
                 >
                     CERRAR SESIÓN
                 </button>
             </div>
         ) : (
-            // Si NO hay usuario -> Botón de Iniciar Sesión
             <Link to="/iniciar-sesion" className="login-button">
                 INICIAR SESIÓN
             </Link>

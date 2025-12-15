@@ -91,6 +91,10 @@ const Routine = sequelize.define('Routine', {
     esPredeterminada: { 
         type: DataTypes.BOOLEAN, 
         defaultValue: false 
+    },
+    duration: { 
+        type: DataTypes.INTEGER, 
+        defaultValue: false 
     } 
 }, { freezeTableName: true, tableName: 'Rutina' });
 

@@ -1,0 +1,262 @@
+/* =========================================
+   1. ESTRUCTURA GENERAL
+   ========================================= */
+.home-container {
+  background-color: #E0FBFC; /* Tu color base */
+  color: #253237;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================================
+   2. HERO SECTION (CABECERA)
+   ========================================= */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 85vh; /* Ocupa casi toda la pantalla inicial */
+  padding: 0 10%;
+  position: relative;
+}
+
+.hero-content {
+  max-width: 600px;
+  z-index: 2;
+  animation: slideUp 0.8s ease-out;
+}
+
+.hero-content h1 {
+  font-size: 3.5rem;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: #253237;
+}
+
+/* Estilo para destacar palabras */
+.highlight {
+  color: #ee9b00; /* Naranja de tu paleta */
+}
+
+/* Efecto de texto con borde (opcional, queda moderno) */
+.stroke-text {
+  -webkit-text-stroke: 2px #253237;
+  color: transparent;
+  display: block;
+  font-size: 4.5rem;
+  letter-spacing: 2px;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  color: #5C6B73;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* --- ELEMENTOS VISUALES (Círculo y Emoji) --- */
+.hero-visual {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Círculo decorativo usando tus colores */
+.circle-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #9DB4C0;
+  border-radius: 50%;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.hero-emoji {
+  font-size: 10rem;
+  z-index: 1;
+  filter: drop-shadow(10px 10px 0px rgba(37,50,55,0.2));
+}
+
+/* =========================================
+   3. BOTONES DEL HOME
+   ========================================= */
+.btn-primary-home, .btn-secondary-home, .btn-outline-home {
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  letter-spacing: 1px;
+}
+
+.btn-primary-home {
+  background-color: #253237;
+  color: #E0FBFC;
+  border: 2px solid #253237;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.btn-primary-home:hover {
+  background-color: #1a2428;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}
+
+.btn-secondary-home {
+  background-color: transparent;
+  color: #253237;
+  border: 2px solid #253237;
+}
+
+.btn-secondary-home:hover {
+  background-color: #253237;
+  color: #E0FBFC;
+}
+
+/* =========================================
+   4. FEATURES SECTION (CARACTERÍSTICAS)
+   ========================================= */
+.features-section {
+  padding: 80px 10%;
+  background-color: #f8fdfe; /* Un tono muy leve para diferenciar */
+  text-align: center;
+}
+
+.features-section h2 {
+  font-size: 2.5rem;
+  color: #253237;
+  margin-bottom: 50px;
+  text-transform: uppercase;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: white;
+  padding: 40px 20px;
+  border-radius: 15px;
+  border: 2px solid #253237; /* Borde grueso estilo TuFitness */
+  box-shadow: 6px 6px 0px rgba(37, 50, 55, 1); /* Sombra dura estilo moderno */
+  transition: transform 0.2s;
+}
+
+.feature-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 10px 10px 0px rgba(37, 50, 55, 1);
+}
+
+.icon-box {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.feature-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #253237;
+}
+
+.feature-card p {
+  color: #5C6B73;
+  line-height: 1.5;
+}
+
+/* =========================================
+   5. CTA BANNER (FINAL)
+   ========================================= */
+.cta-banner {
+  background-color: #253237;
+  color: #E0FBFC;
+  padding: 80px 20px;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.cta-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.cta-content p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  opacity: 0.9;
+}
+
+.btn-outline-home {
+  background: transparent;
+  color: #E0FBFC;
+  border: 2px solid #E0FBFC;
+}
+
+.btn-outline-home:hover {
+  background: #E0FBFC;
+  color: #253237;
+}
+
+/* =========================================
+   6. ANIMACIONES Y RESPONSIVE
+   ========================================= */
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+@media (max-width: 968px) {
+  .hero-section {
+    flex-direction: column-reverse;
+    text-align: center;
+    justify-content: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+  
+  .hero-content {
+    margin-top: 30px;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+  
+  .hero-visual {
+    width: 250px;
+    height: 250px;
+  }
+
+  .hero-emoji {
+    font-size: 6rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  
+  .stroke-text {
+    font-size: 3rem;
+  }
+}

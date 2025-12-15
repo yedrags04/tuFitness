@@ -91,7 +91,7 @@ router.post('/', auth, async (req, res) => {
                 // 2.1. Crear el Ejercicio
                 const newExercise = await Exercise.create({
                     nombre: ex.name, // Mapeo: 'name' (frontend) -> 'nombre' (BD)
-                    day: ex.day || 'Lunes', 
+                    day: ex.day || 'Dia 1', 
                     RutinaId: newRoutine.id 
                 });
 
@@ -128,7 +128,7 @@ router.post('/', auth, async (req, res) => {
 // ==========================================
 router.put('/:id', auth, async (req, res) => {
     // 🔑 CLAVE: Extraer 'nombre' y 'esPredeterminada'
-    const { name, isDefault, exercises } = req.body;
+    const { name, duration, isDefault, exercises } = req.body;
     const routineId = req.params.id;
 
     try {
@@ -143,6 +143,14 @@ router.put('/:id', auth, async (req, res) => {
             // ...
         }
 
+        await routine.update({ 
+            nombre: name, // 🔑 CLAVE: Mapear 'name' del frontend a 'nombre' de la BD
+            // Si 'duration' es un campo de tu modelo Routine, añádelo aquí
+            // Si no es un campo de tu modelo Routine, bórralo
+            duration: duration 
+            // Si también permites cambiar esPredeterminada, añádelo: esPredeterminada: isDefault || false
+        });
+
         await Exercise.destroy({ where: { RutinaId: routineId } }); 
         
         // 🛑 CLAVE 4: Recrear Ejercicios Y Sus Series (Misma lógica del POST)
@@ -150,7 +158,7 @@ router.put('/:id', auth, async (req, res) => {
             for (const ex of exercises) {
                 const newExercise = await Exercise.create({
                     nombre: ex.name, 
-                    day: ex.day || 'Lunes', 
+                    day: ex.day || 'Dia 1', 
                     RutinaId: routineId 
                 });
                 if (ex.series && ex.series.length > 0) {

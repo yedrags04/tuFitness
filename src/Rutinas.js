@@ -290,23 +290,31 @@ const Rutinas = () => {
 
       <div className="routines-grid">
         {misRutinas.length > 0 ? (
-          misRutinas.map((routine) => (
-            <div className="routine-card" key={routine._id || routine.id}>
-              <h3>{routine.name || routine.nombre}</h3>
-              <p style={{fontSize:'0.9em', color:'#1d2122ff'}}>Duración: {routine.duration || 'N/A'}</p>
-              <div className="routine-tags">
-                 <span className="tag-day">
-                    {/* Calculamos días únicos seguros */}
-                    {routine.exercises ? new Set(routine.exercises.map(e => extraerNumeroDia(e.dia))).size : 1} Días
-                 </span>
+          misRutinas.map((routine) => {
+            // 🛑 CORRECCIÓN: Detectar si viene como 'Exercises' o 'exercises'
+            const ejerciciosReales = routine.Exercises || routine.exercises || [];
+            
+            // Calculamos los días únicos usando la lista correcta
+            const numeroDeDias = ejerciciosReales.length > 0 
+                ? new Set(ejerciciosReales.map(e => extraerNumeroDia(e.dia || e.day))).size 
+                : 1;
+
+            return (
+              <div className="routine-card" key={routine._id || routine.id}>
+                <h3>{routine.name || routine.nombre}</h3>
+                <p style={{fontSize:'0.9em', color:'#1d2122ff'}}>Duración: {routine.duration || 'N/A'}</p>
+                <div className="routine-tags">
+                   {/* Usamos la variable calculada arriba */}
+                   <span className="tag-day">{numeroDeDias} Días</span>
+                </div>
+                <div className="routine-actions">
+                   <button className="btn-view" onClick={() => openModal(routine, 'adjust')}>Ver / Ajustar</button>
+                   <button className="btn-edit" onClick={() => openModal(routine, 'edit')}>Editar Todo</button>
+                   <button className="btn-delete" onClick={() => handleDelete(routine._id || routine.id)}>Borrar</button>
+                </div>
               </div>
-              <div className="routine-actions">
-                 <button className="btn-view" onClick={() => openModal(routine, 'adjust')}>Ver / Ajustar</button>
-                 <button className="btn-edit" onClick={() => openModal(routine, 'edit')}>Editar Todo</button>
-                 <button className="btn-delete" onClick={() => handleDelete(routine._id || routine.id)}>Borrar</button>
-              </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p>No has creado rutinas todavía.</p>
         )}

@@ -4,7 +4,7 @@ dotenv.config();
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./db/sequelize'); 
-const authRoute = require('./routes/auth');
+const authRoute = require('./middleware/auth');
 const routineRoute = require('./routes/routines');
 
 

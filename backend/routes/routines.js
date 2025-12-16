@@ -1,28 +1,11 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const { Routine, Exercise, Set, Op } = require('../db/sequelize');
+const auth = require('../middleware/auth');
 
 // ==========================================
 // MIDDLEWARE DE SEGURIDAD (INTEGRADO)
 // ==========================================
-const auth = (req, res, next) => {
-    let token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-        token = req.header('x-auth-token');
-    }
-
-    if (!token) {
-        return res.status(401).json({ msg: 'No hay token, permiso denegado' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-        req.user = decoded; 
-        next();
-    } catch (err) {
-        res.status(401).json({ msg: 'Token no es válido' });
-    }
-};
 
 // backend/routes/routines.js (CORREGIDO)
 

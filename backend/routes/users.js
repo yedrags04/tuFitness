@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs'); // Necesario para comparar contraseñas
 const { User } = require('../db/sequelize'); 
-const auth = require('./auth'); // Tu middleware de token
+const auth = require('../middleware/auth'); // Tu middleware de token
 
 // @route   GET api/users/profile
 // @desc    Obtener datos del usuario

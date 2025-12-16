@@ -113,7 +113,7 @@ const Exercise = sequelize.define('Exercise', {
     dia: { 
         type: DataTypes.STRING, 
         allowNull: false, 
-        defaultValue: 'Lunes' 
+        defaultValue: '1' 
     }
 }, { freezeTableName: true, tableName: 'Ejercicio' });
 

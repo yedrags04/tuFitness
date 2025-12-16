@@ -52,13 +52,11 @@ function Header() {
               Inicio
             </Link>
             
-            {/* Si hay usuario, mostramos Rutinas y Perfil */}
             {user && (
               <>
                 <Link to="/rutinas" className="dropdown-link" onClick={closeMenu}>
                   Rutinas
                 </Link>
-                {/* --- NUEVO: Enlace al Perfil en el menú --- */}
                 <Link to="/perfil" className="dropdown-link" onClick={closeMenu}>
                   Mi Perfil
                 </Link>
@@ -82,8 +80,6 @@ function Header() {
         {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px'}}>
                 
-                {/* --- NUEVO: El saludo ahora es un Link al Perfil --- */}
-                {/* Se oculta en móviles muy pequeños para no saturar */}
                 <Link 
                   to="/perfil" 
                   style={{ 

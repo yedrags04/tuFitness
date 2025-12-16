@@ -6,108 +6,125 @@ import './css/Perfil.css';
 const Perfil = () => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Estado inicial (Datos del usuario)
+  // Estado de datos del usuario
   const [userData, setUserData] = useState({
     nombre: '',
     email: '',
-    edad: '',
-    peso: '',     // en kg
-    altura: '',   // en cm
-    objetivo: 'Mantenimiento', // Perdida de peso, Ganancia muscular, etc.
-    genero: 'Prefiero no decirlo'
+    edad: '',       // Solo lectura
+    genero: '',     // Solo lectura
+    peso: '',     
+    altura: '',
+    // Campos para cambio de contraseña (no se guardan en userData visual, se manejan aparte o aquí)
+    passwordActual: '',
+    passwordNueva: ''
   });
 
-  // Estado temporal para guardar cambios antes de confirmar
+  // Copia de seguridad para cancelar cambios
   const [tempData, setTempData] = useState({});
 
-  // Simulación de carga de datos (Sustituir por useEffect con Axios real)
+  // 1. CARGAR PERFIL
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
       if (!token) return navigate('/iniciar-sesion');
 
-      setLoading(true);
       try {
-        // AQUÍ IRÍA TU LLAMADA REAL:
-        // const res = await axios.get('http://localhost:5000/api/auth/me', { headers: { 'x-auth-token': token } });
-        // setUserData(res.data);
-
-        // MOCK DATA (Para que veas como queda el diseño ahora mismo)
-        setTimeout(() => {
-          setUserData({
-            nombre: 'Usuario Fitness',
-            email: 'usuario@ejemplo.com',
-            edad: 25,
-            peso: 75,
-            altura: 178,
-            objetivo: 'Ganancia Muscular',
-            genero: 'Hombre'
-          });
-          setLoading(false);
-        }, 500);
-
+        const res = await axios.get('http://localhost:5000/api/users/profile', {
+          headers: { 'x-auth-token': token }
+        });
+        
+        setUserData({
+            nombre: res.data.nombre || '',
+            email: res.data.email || '',
+            edad: res.data.edad || '', // Viene calculado del back
+            peso: res.data.peso || '',
+            altura: res.data.altura || '',
+            genero: res.data.genero || '',
+            passwordActual: '',
+            passwordNueva: ''
+        });
+        setLoading(false);
       } catch (err) {
         console.error(err);
         setLoading(false);
-        // Si falla el token, log out
-        // localStorage.removeItem('token');
-        // navigate('/iniciar-sesion');
+        if (err.response && err.response.status === 401) {
+            localStorage.removeItem('token'); 
+            navigate('/iniciar-sesion');
+        }
       }
     };
     fetchProfile();
   }, [navigate]);
 
-  // Activar modo edición
+  // Manejadores de botones
   const handleEditClick = () => {
-    setTempData({ ...userData }); // Hacemos copia de seguridad
+    setTempData({ ...userData }); // Guardar estado actual
     setIsEditing(true);
   };
 
-  // Cancelar edición
   const handleCancelClick = () => {
-    setUserData(tempData); // Restauramos datos originales
+    setUserData(tempData); // Restaurar estado
     setIsEditing(false);
   };
 
-  // Manejar cambios en inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
   };
 
-  // Guardar cambios
+  // 2. GUARDAR CAMBIOS
   const handleSaveClick = async () => {
     const token = localStorage.getItem('token');
+    
+    // Validación simple
+    if(!userData.nombre || !userData.email) {
+        return alert("Nombre y Correo son obligatorios.");
+    }
+
     try {
-      // AQUÍ TU PUT/POST REAL
-      // await axios.put('http://localhost:5000/api/users/profile', userData, { headers: { 'x-auth-token': token } });
+      await axios.put('http://localhost:5000/api/users/profile', userData, {
+         headers: { 'x-auth-token': token } 
+      });
       
-      alert("¡Perfil actualizado correctamente!");
+      alert("¡Datos actualizados!");
       setIsEditing(false);
+      // Limpiamos los campos de contraseña tras guardar con éxito
+      setUserData(prev => ({ ...prev, passwordActual: '', passwordNueva: '' }));
+
+      // Actualizar nombre en localStorage para el Header
+      const storedUser = JSON.parse(localStorage.getItem('user'));
+      if(storedUser) {
+          storedUser.username = userData.nombre;
+          localStorage.setItem('user', JSON.stringify(storedUser));
+      }
+
     } catch (err) {
       console.error(err);
-      alert("Error al actualizar perfil");
+      // Mostrar mensaje de error específico del backend (ej: contraseña incorrecta)
+      const errorMsg = err.response?.data?.msg || "Error al actualizar perfil";
+      alert(errorMsg);
     }
   };
 
-  // Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/iniciar-sesion');
+    localStorage.removeItem('user');
+    window.location.href = "/"; 
   };
 
-  // --- CÁLCULO DE IMC (Índice de Masa Corporal) ---
+  // Cálculo IMC visual
   const calcularIMC = () => {
     if (userData.peso && userData.altura) {
       const alturaMetros = userData.altura / 100;
-      return (userData.peso / (alturaMetros * alturaMetros)).toFixed(1);
+      const imc = (userData.peso / (alturaMetros * alturaMetros)).toFixed(1);
+      return (isNaN(imc) || !isFinite(imc)) ? '--' : imc;
     }
     return '--';
   };
 
-  if (loading) return <div className="profile-container"><p>Cargando perfil...</p></div>;
+  if (loading) return <div className="profile-container"><p>Cargando...</p></div>;
 
   return (
     <div className="profile-container">
@@ -117,13 +134,12 @@ const Perfil = () => {
 
       <div className="profile-card-wrapper">
         
-        {/* LADO IZQUIERDO: Avatar y Resumen */}
+        {/* SIDEBAR */}
         <div className="profile-sidebar">
           <div className="avatar-circle">
-            {/* Si no hay foto, mostramos inicial */}
             <span>{userData.nombre ? userData.nombre.charAt(0).toUpperCase() : 'U'}</span>
           </div>
-          <h3 className="sidebar-name">{userData.nombre || 'Usuario'}</h3>
+          <h3 className="sidebar-name">{userData.nombre}</h3>
           <p className="sidebar-email">{userData.email}</p>
           
           <div className="stat-box">
@@ -131,19 +147,15 @@ const Perfil = () => {
             <span className="stat-value">{calcularIMC()}</span>
           </div>
           
-          <button className="btn-logout" onClick={handleLogout}>
-            Cerrar Sesión
-          </button>
+          <button className="btn-logout" onClick={handleLogout}>Cerrar Sesión</button>
         </div>
 
-        {/* LADO DERECHO: Formulario de Datos */}
+        {/* FORMULARIO */}
         <div className="profile-details">
           <div className="details-header">
-            <h3>Información Personal</h3>
+            <h3>Datos Personales</h3>
             {!isEditing ? (
-              <button className="btn-edit-profile" onClick={handleEditClick}>
-                ✏️ Editar
-              </button>
+              <button className="btn-edit-profile" onClick={handleEditClick}>✏️ Editar</button>
             ) : (
               <div className="edit-actions">
                 <button className="btn-cancel-edit" onClick={handleCancelClick}>Cancelar</button>
@@ -152,95 +164,75 @@ const Perfil = () => {
             )}
           </div>
 
-          <form className="profile-form">
-            {/* Nombre */}
+          <form className="profile-form" onSubmit={(e) => e.preventDefault()}>
+            
+            {/* NOMBRE (Editable) */}
             <div className="form-group-profile">
-              <label>Nombre Completo</label>
-              <input 
-                type="text" 
-                name="nombre" 
-                value={userData.nombre} 
-                onChange={handleChange} 
-                disabled={!isEditing} 
-              />
+              <label>Nombre de Usuario</label>
+              <input type="text" name="nombre" value={userData.nombre} onChange={handleChange} disabled={!isEditing} />
             </div>
 
-            {/* Email (Generalmente no editable o requiere validación extra) */}
+            {/* EMAIL (Editable) */}
             <div className="form-group-profile">
               <label>Correo Electrónico</label>
-              <input 
-                type="email" 
-                name="email" 
-                value={userData.email} 
-                disabled={true} // Email bloqueado por seguridad habitual
-                className="input-disabled"
-              />
+              <input type="email" name="email" value={userData.email} onChange={handleChange} disabled={!isEditing} />
             </div>
 
             <div className="form-row">
+              {/* EDAD (Solo lectura, viene de anioNacimiento) */}
               <div className="form-group-profile">
                 <label>Edad</label>
-                <input 
-                  type="number" 
-                  name="edad" 
-                  value={userData.edad} 
-                  onChange={handleChange} 
-                  disabled={!isEditing} 
-                />
+                <input type="text" value={userData.edad ? `${userData.edad} años` : '--'} disabled={true} className="input-disabled"/>
               </div>
+              {/* GÉNERO (Solo lectura) */}
               <div className="form-group-profile">
                 <label>Género</label>
-                <select 
-                  name="genero" 
-                  value={userData.genero} 
-                  onChange={handleChange} 
-                  disabled={!isEditing}
-                >
-                  <option value="Hombre">Hombre</option>
-                  <option value="Mujer">Mujer</option>
-                  <option value="Otro">Otro</option>
-                  <option value="Prefiero no decirlo">Prefiero no decirlo</option>
-                </select>
+                <input type="text" value={userData.genero} disabled={true} className="input-disabled"/>
               </div>
             </div>
 
             <div className="form-row">
+               {/* PESO (Editable) */}
                <div className="form-group-profile">
                 <label>Peso (kg)</label>
-                <input 
-                  type="number" 
-                  name="peso" 
-                  value={userData.peso} 
-                  onChange={handleChange} 
-                  disabled={!isEditing} 
-                />
+                <input type="number" name="peso" value={userData.peso} onChange={handleChange} disabled={!isEditing} />
               </div>
+              {/* ALTURA (Editable) */}
               <div className="form-group-profile">
                 <label>Altura (cm)</label>
-                <input 
-                  type="number" 
-                  name="altura" 
-                  value={userData.altura} 
-                  onChange={handleChange} 
-                  disabled={!isEditing} 
-                />
+                <input type="number" name="altura" value={userData.altura} onChange={handleChange} disabled={!isEditing} />
               </div>
             </div>
 
-            <div className="form-group-profile">
-              <label>Objetivo Principal</label>
-              <select 
-                  name="objetivo" 
-                  value={userData.objetivo} 
-                  onChange={handleChange} 
-                  disabled={!isEditing}
-                >
-                  <option value="Perdida de Peso">Pérdida de Peso</option>
-                  <option value="Mantenimiento">Mantenimiento</option>
-                  <option value="Ganancia Muscular">Ganancia Muscular</option>
-                  <option value="Resistencia">Mejorar Resistencia</option>
-              </select>
-            </div>
+            {/* SECCIÓN CAMBIO DE CONTRASEÑA (Solo visible en modo edición) */}
+            {isEditing && (
+                <div style={{ marginTop: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '8px', border: '1px dashed #ccc' }}>
+                    <h4 style={{marginTop: 0, marginBottom: '10px', color: '#253237'}}>Cambiar Contraseña (Opcional)</h4>
+                    
+                    <div className="form-group-profile">
+                        <label>Nueva Contraseña</label>
+                        <input 
+                            type="password" 
+                            name="passwordNueva" 
+                            value={userData.passwordNueva} 
+                            onChange={handleChange} 
+                            placeholder="Deja vacío si no quieres cambiarla"
+                        />
+                    </div>
+
+                    {userData.passwordNueva && (
+                        <div className="form-group-profile">
+                            <label style={{color: '#d32f2f'}}>Contraseña Actual (Requerida para confirmar)</label>
+                            <input 
+                                type="password" 
+                                name="passwordActual" 
+                                value={userData.passwordActual} 
+                                onChange={handleChange} 
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
 
           </form>
         </div>

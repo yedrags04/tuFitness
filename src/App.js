@@ -7,10 +7,9 @@ import Signup from './Signup';
 import HomeContent from './HomeContent'; 
 import Rutinas from './Rutinas';
 import EditarRutina from './EditarRutina';
-import Perfil from './Perfil'; // <--- 1. IMPORTAR AQUÍ
+import Perfil from './Perfil'; 
 
 function App() {
-  // Verificamos si hay un usuario guardado en localStorage
   const user = localStorage.getItem("user");
 
   return (
@@ -20,11 +19,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeContent />} /> 
           
-          {/* Si ya hay usuario, redirige a Rutinas, si no, muestra Login */}
           <Route path="/iniciar-sesion" element={user ? <Navigate to="/rutinas" /> : <Login />} />
           <Route path="/registrarse" element={user ? <Navigate to="/rutinas" /> : <Signup />} /> 
           
-          {/* RUTAS PROTEGIDAS: Si no hay usuario, redirige a Login */}
           <Route 
             path="/rutinas" 
             element={user ? <Rutinas /> : <Navigate to="/iniciar-sesion" />} 
@@ -35,7 +32,6 @@ function App() {
             element={user ? <EditarRutina /> : <Navigate to="/iniciar-sesion" />} 
           />
 
-          {/* --- 2. NUEVA RUTA PROTEGIDA PARA PERFIL --- */}
           <Route 
             path="/perfil" 
             element={user ? <Perfil /> : <Navigate to="/iniciar-sesion" />} 

@@ -19,6 +19,7 @@ app.use(express.json());
 // Rutas
 app.use("/api/auth", authRoute);
 app.use("/api/routines", routineRoute);
+app.use('/api/users', require('./routes/users'));
 
 const PORT = process.env.PORT || 42311;
 

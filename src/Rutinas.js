@@ -38,8 +38,8 @@ const Rutinas = () => {
         headers: { 'x-auth-token': token },
       });
       const allRoutines = res.data;
-      setMisRutinas(allRoutines.filter(r => !r.isDefault));
-      setRutinasPredeterminadas(allRoutines.filter(r => r.isDefault));
+      setMisRutinas(allRoutines.filter(r => !r.esPredeterminada));
+      setRutinasPredeterminadas(allRoutines.filter(r => r.esPredeterminada));
     } catch (err) {
       console.error(err);
     }

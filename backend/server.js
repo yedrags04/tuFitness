@@ -1,4 +1,4 @@
-// backend/server.js
+
 const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
@@ -11,7 +11,7 @@ const usersRoute = require('./routes/users');
 
 const app = express();
 
-// Iniciar la conexión a la base de datos
+
 connectDB(); 
 
 app.use(cors());

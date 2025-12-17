@@ -11,8 +11,7 @@ function Login() {
   const [error, setError] = useState(false);
 
   const handleChange = (e) => {
-    // Usamos e.target.name para que coincida con la estructura más común, 
-    // pero tu código usa e.target.id, así que mantenemos ID en los inputs.
+    
     setCredentials((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
@@ -38,9 +37,9 @@ function Login() {
   return (
     <div className="login-page"> 
       
-      {/* Estructura del Anillo */}
+      
       <div className="ring">
-        {/* Colores ajustados a tu paleta (Rojo alerta, Azul oscuro, Naranja acento) */}
+        
         <i style={{'--clr': '#253237'}}></i>
         <i style={{'--clr': '#5C6B73'}}></i>
         <i style={{'--clr': '#9DB4C0'}}></i>
@@ -48,7 +47,7 @@ function Login() {
         <div className="login">
           <h2>Iniciar Sesión</h2>
           
-          {/* El formulario envuelve los inputs para manejar el enter */}
+          
           <form style={{width: '100%', display: 'flex', flexDirection: 'column', gap: '20px'}} onSubmit={handleLogin}>
             
             <div className="inputBx">

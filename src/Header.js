@@ -94,7 +94,7 @@ function Header() {
                   title="Ir a mi perfil"
                 >
                     <span>Hola, {user.username}</span>
-                    {/* Un pequeño icono de usuario opcional */}
+              
                     <span style={{fontSize: '1.2rem'}}>👤</span>
                 </Link>
 

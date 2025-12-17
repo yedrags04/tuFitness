@@ -1,10 +1,10 @@
-// backend/routes/auth.js
+
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../db/sequelize'); 
 
-// REGISTRO
+
 router.post('/register', async (req, res) => {
     const { username, email, contrasena, genero, anioNacimiento, estatura, peso } = req.body;
     
@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// LOGIN
+
 router.post('/login', async (req, res) => {
     const { username, contrasena } = req.body; 
     
@@ -45,7 +45,7 @@ router.post('/login', async (req, res) => {
         const validPassword = await bcrypt.compare(contrasena, user.contrasena); 
         if (!validPassword) return res.status(400).json("Contraseña incorrecta");
         
-        // Generar Token
+    
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
         
         const userData = { 

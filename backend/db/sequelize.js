@@ -1,25 +1,22 @@
-// backend/db/sequelize.js
+
 
 const { Sequelize, DataTypes, Op } = require('sequelize');
 const dotenv = require('dotenv');
-// Ya NO se requiere: const sqlite3 = require('@libsql/sqlite3');
-// Ya NO se requiere: el parche de customDriver
 
 dotenv.config();
 
-// --- 1. CONFIGURACIÓN DE CONEXIÓN A MYSQL ---
 
 console.log("🚀 Conectando a MySQL Local...");
 
 const sequelize = new Sequelize(
-    process.env.DB_NAME,       // Nombre de la BD (requiere .env actualizado)
-    process.env.DB_USER,       // Usuario
-    process.env.DB_PASSWORD,   // Contraseña
+    process.env.DB_NAME,       
+    process.env.DB_USER,      
+    process.env.DB_PASSWORD,   
     {
         host: process.env.DB_HOST || 'localhost',
-        dialect: 'mysql', // <-- CAMBIO CLAVE: Usar dialecto MySQL
-        dialectModule: require('mysql2'), // <-- Usar el paquete que instalaste
-        logging: false, // Puedes cambiar a console.log para debugging SQL
+        dialect: 'mysql', 
+        dialectModule: require('mysql2'), 
+        logging: false,
         pool: {
             max: 5,
             min: 0,
@@ -33,9 +30,7 @@ const sequelize = new Sequelize(
     }
 );
 
-// --- 2. MODELOS (Se mantienen intactos, solo cambian los tipos nativos que MySQL maneja) ---
 
-// Modelo User (Usuario)
 const User = sequelize.define('User', { 
     id: { 
         type: DataTypes.INTEGER, 
@@ -54,7 +49,7 @@ const User = sequelize.define('User', {
         validate: { isEmail: true } 
     },
     genero: { 
-        type: DataTypes.BOOLEAN, // MySQL lo manejará como TINYINT(1)
+        type: DataTypes.BOOLEAN, 
         allowNull: true 
     },
     anioNacimiento: { 
@@ -77,7 +72,7 @@ const User = sequelize.define('User', {
 }, { freezeTableName: true, tableName: 'Usuario' });
 
 
-// Modelo Routine (Rutina)
+
 const Routine = sequelize.define('Routine', { 
     id: { 
         type: DataTypes.INTEGER, 
@@ -99,7 +94,7 @@ const Routine = sequelize.define('Routine', {
 }, { freezeTableName: true, tableName: 'Rutina' });
 
 
-// Modelo Exercise (Ejercicio)
+
 const Exercise = sequelize.define('Exercise', { 
     id: { 
         type: DataTypes.INTEGER, 
@@ -118,7 +113,7 @@ const Exercise = sequelize.define('Exercise', {
 }, { freezeTableName: true, tableName: 'Ejercicio' });
 
 
-// Modelo Set (Serie)
+
 const Set = sequelize.define('Set', {
     id: { 
         type: DataTypes.INTEGER, 
@@ -131,13 +126,13 @@ const Set = sequelize.define('Set', {
         defaultValue: 0 
     },
     peso: { 
-        type: DataTypes.FLOAT, // Usamos FLOAT para mayor precisión que DOUBLE si no es necesario
+        type: DataTypes.FLOAT, 
         defaultValue: 0 
     }
 }, { freezeTableName: true, tableName: 'Set', timestamps: false });
 
 
-// --- 3. RELACIONES (Se mantienen correctas) ---
+
 User.hasMany(Routine, { foreignKey: 'UsuarioId' }); 
 Routine.belongsTo(User, { foreignKey: 'UsuarioId' }); 
 
@@ -153,13 +148,12 @@ const connectDB = async () => {
         await sequelize.authenticate();
         console.log('✅ Conexión a MySQL establecida.');
         
-        // Ya no necesitamos las consultas PRAGMA ni las limpiezas de tablas backup
-        // MySQL es más estable con { force: false, alter: true }
+        
         await sequelize.sync({ force: false, alter: true }); 
 
         console.log('✅ Tablas sincronizadas correctamente.');
     } catch (error) {
-        // En MySQL, los errores de conexión se verán como "Access denied" o "Unknown database"
+        
         console.error('❌ Error crítico: Falló la conexión o la sincronización con MySQL.');
         console.error('Detalles:', error.message);
     }

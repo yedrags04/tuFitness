@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './css/Home.css'; // Asegúrate de crear este archivo
+import './css/Home.css'; 
 
 function HomeContent() {
   const navigate = useNavigate();
@@ -8,11 +8,12 @@ function HomeContent() {
   return (
     <div className="home-container">
       
-      {/* --- HERO SECTION: El impacto visual inicial --- */}
+      
       <section className="hero-section">
         <div className="hero-content">
           <h1>
-            Tu Cuerpo, <span className="highlight">Tu Ritmo</span>, <br />
+            Tu Cuerpo <br />
+            <span className="highlight">Tu Ritmo</span> <br />
             <span className="stroke-text">TuFitness</span>
           </h1>
           <p>
@@ -28,14 +29,14 @@ function HomeContent() {
             </button>
           </div>
         </div>
-        {/* Aquí podrías poner una imagen o ilustración vectorial más tarde */}
+        
         <div className="hero-visual">
            <div className="circle-bg"></div>
            <span className="hero-emoji">🏋️‍♂️</span>
         </div>
       </section>
 
-      {/* --- FEATURES SECTION: ¿Qué ofrece la web? --- */}
+      
       <section className="features-section">
         <h2>¿Por qué elegir TuFitness?</h2>
         <div className="features-grid">
@@ -61,7 +62,7 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* --- BANNER INFERIOR --- */}
+      
       <section className="cta-banner">
         <div className="cta-content">
             <h2>Empieza hoy mismo</h2>

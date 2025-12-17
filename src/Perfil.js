@@ -8,23 +8,23 @@ const Perfil = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Estado de datos del usuario
+ 
   const [userData, setUserData] = useState({
     nombre: '',
     email: '',
-    edad: '',       // Solo lectura
-    genero: '',     // Solo lectura
+    edad: '',      
+    genero: '',    
     peso: '',     
     altura: '',
-    // Campos para cambio de contraseña (no se guardan en userData visual, se manejan aparte o aquí)
+   
     passwordActual: '',
     passwordNueva: ''
   });
 
-  // Copia de seguridad para cancelar cambios
+  
   const [tempData, setTempData] = useState({});
 
-  // 1. CARGAR PERFIL
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
@@ -38,7 +38,7 @@ const Perfil = () => {
         setUserData({
             nombre: res.data.nombre || '',
             email: res.data.email || '',
-            edad: res.data.edad || '', // Viene calculado del back
+            edad: res.data.edad || '', 
             peso: res.data.peso || '',
             altura: res.data.altura || '',
             genero: res.data.genero || '',
@@ -58,14 +58,14 @@ const Perfil = () => {
     fetchProfile();
   }, [navigate]);
 
-  // Manejadores de botones
+  
   const handleEditClick = () => {
-    setTempData({ ...userData }); // Guardar estado actual
+    setTempData({ ...userData }); 
     setIsEditing(true);
   };
 
   const handleCancelClick = () => {
-    setUserData(tempData); // Restaurar estado
+    setUserData(tempData); 
     setIsEditing(false);
   };
 
@@ -74,11 +74,11 @@ const Perfil = () => {
     setUserData({ ...userData, [name]: value });
   };
 
-  // 2. GUARDAR CAMBIOS
+
   const handleSaveClick = async () => {
     const token = localStorage.getItem('token');
     
-    // Validación simple
+   
     if(!userData.nombre || !userData.email) {
         return alert("Nombre y Correo son obligatorios.");
     }
@@ -90,10 +90,10 @@ const Perfil = () => {
       
       alert("¡Datos actualizados!");
       setIsEditing(false);
-      // Limpiamos los campos de contraseña tras guardar con éxito
+      
       setUserData(prev => ({ ...prev, passwordActual: '', passwordNueva: '' }));
 
-      // Actualizar nombre en localStorage para el Header
+      
       const storedUser = JSON.parse(localStorage.getItem('user'));
       if(storedUser) {
           storedUser.username = userData.nombre;
@@ -102,7 +102,7 @@ const Perfil = () => {
 
     } catch (err) {
       console.error(err);
-      // Mostrar mensaje de error específico del backend (ej: contraseña incorrecta)
+      
       const errorMsg = err.response?.data?.msg || "Error al actualizar perfil";
       alert(errorMsg);
     }
@@ -134,7 +134,7 @@ const Perfil = () => {
 
       <div className="profile-card-wrapper">
         
-        {/* SIDEBAR */}
+       
         <div className="profile-sidebar">
           <div className="avatar-circle">
             <span>{userData.nombre ? userData.nombre.charAt(0).toUpperCase() : 'U'}</span>
@@ -150,7 +150,7 @@ const Perfil = () => {
           <button className="btn-logout" onClick={handleLogout}>Cerrar Sesión</button>
         </div>
 
-        {/* FORMULARIO */}
+       
         <div className="profile-details">
           <div className="details-header">
             <h3>Datos Personales</h3>
@@ -166,25 +166,25 @@ const Perfil = () => {
 
           <form className="profile-form" onSubmit={(e) => e.preventDefault()}>
             
-            {/* NOMBRE (Editable) */}
+           
             <div className="form-group-profile">
               <label>Nombre de Usuario</label>
               <input type="text" name="nombre" value={userData.nombre} onChange={handleChange} disabled={!isEditing} />
             </div>
 
-            {/* EMAIL (Editable) */}
+           
             <div className="form-group-profile">
               <label>Correo Electrónico</label>
               <input type="email" name="email" value={userData.email} onChange={handleChange} disabled={!isEditing} />
             </div>
 
             <div className="form-row">
-              {/* EDAD (Solo lectura, viene de anioNacimiento) */}
+             
               <div className="form-group-profile">
                 <label>Edad</label>
                 <input type="text" value={userData.edad ? `${userData.edad} años` : '--'} disabled={true} className="input-disabled"/>
               </div>
-              {/* GÉNERO (Solo lectura) */}
+             
               <div className="form-group-profile">
                 <label>Género</label>
                 <input type="text" value={userData.genero} disabled={true} className="input-disabled"/>
@@ -192,19 +192,19 @@ const Perfil = () => {
             </div>
 
             <div className="form-row">
-               {/* PESO (Editable) */}
+              
                <div className="form-group-profile">
                 <label>Peso (kg)</label>
                 <input type="number" name="peso" value={userData.peso} onChange={handleChange} disabled={!isEditing} />
               </div>
-              {/* ALTURA (Editable) */}
+              
               <div className="form-group-profile">
                 <label>Altura (cm)</label>
                 <input type="number" name="altura" value={userData.altura} onChange={handleChange} disabled={!isEditing} />
               </div>
             </div>
 
-            {/* SECCIÓN CAMBIO DE CONTRASEÑA (Solo visible en modo edición) */}
+            
             {isEditing && (
                 <div style={{ marginTop: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '8px', border: '1px dashed #ccc' }}>
                     <h4 style={{marginTop: 0, marginBottom: '10px', color: '#253237'}}>Cambiar Contraseña (Opcional)</h4>

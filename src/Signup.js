@@ -21,11 +21,12 @@ function Cuestionario() {
     const handleChange = (e) => {
         let value = e.target.value;
 
-        if (e.target.name === 'genero') { 
+        // Manejo especial para el género
+        if (e.target.name === 'genero') { // Cambié a e.target.name para radios
             value = (value === 'true');
         }
 
-        const id = e.target.id || e.target.name; 
+        const id = e.target.id || e.target.name; // Fallback para radios
 
         if (['anioNacimiento', 'estatura', 'peso'].includes(id)) {
             value = value ? parseFloat(value) : ''; 
@@ -82,11 +83,13 @@ function Cuestionario() {
                 <i style={{'--clr': '#C2DFE3'}}></i>
                 <i style={{'--clr': '#9DB4C0'}}></i>
                 
+                
                 <div className="login"> 
                     <h2>Registro</h2>
                     
                     <form onSubmit={handleSubmit} style={{width: '100%'}}>
                         
+                        {/* Contenedor con scroll para que quepan todos los inputs */}
                         <div className="signup-scroll-container">
                             
                             <div className="inputBx">
@@ -101,7 +104,7 @@ function Cuestionario() {
                                 <input type="password" id="contrasena" placeholder="Contraseña *" value={formData.contrasena} onChange={handleChange} required />
                             </div>
 
-                            
+                            {/* Género */}
                             <div className="radio-group-styled">
                                 <label>
                                     <input type="radio" name="genero" value="true" onChange={handleChange} required /> Masc.

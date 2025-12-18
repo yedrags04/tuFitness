@@ -8,15 +8,15 @@ const Perfil = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
- 
+  
   const [userData, setUserData] = useState({
     nombre: '',
     email: '',
-    edad: '',      
-    genero: '',    
+    edad: '',       
+    genero: '',     
     peso: '',     
     altura: '',
-   
+    
     passwordActual: '',
     passwordNueva: ''
   });
@@ -24,7 +24,7 @@ const Perfil = () => {
   
   const [tempData, setTempData] = useState({});
 
-
+  
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('token');
@@ -74,11 +74,11 @@ const Perfil = () => {
     setUserData({ ...userData, [name]: value });
   };
 
-
+  
   const handleSaveClick = async () => {
     const token = localStorage.getItem('token');
     
-   
+    
     if(!userData.nombre || !userData.email) {
         return alert("Nombre y Correo son obligatorios.");
     }
@@ -114,7 +114,7 @@ const Perfil = () => {
     window.location.href = "/"; 
   };
 
-  // Cálculo IMC visual
+  
   const calcularIMC = () => {
     if (userData.peso && userData.altura) {
       const alturaMetros = userData.altura / 100;
@@ -134,7 +134,7 @@ const Perfil = () => {
 
       <div className="profile-card-wrapper">
         
-       
+        {/* SIDEBAR */}
         <div className="profile-sidebar">
           <div className="avatar-circle">
             <span>{userData.nombre ? userData.nombre.charAt(0).toUpperCase() : 'U'}</span>
@@ -150,7 +150,7 @@ const Perfil = () => {
           <button className="btn-logout" onClick={handleLogout}>Cerrar Sesión</button>
         </div>
 
-       
+        {/* FORMULARIO */}
         <div className="profile-details">
           <div className="details-header">
             <h3>Datos Personales</h3>
@@ -166,25 +166,25 @@ const Perfil = () => {
 
           <form className="profile-form" onSubmit={(e) => e.preventDefault()}>
             
-           
+            
             <div className="form-group-profile">
               <label>Nombre de Usuario</label>
               <input type="text" name="nombre" value={userData.nombre} onChange={handleChange} disabled={!isEditing} />
             </div>
 
-           
+            
             <div className="form-group-profile">
               <label>Correo Electrónico</label>
               <input type="email" name="email" value={userData.email} onChange={handleChange} disabled={!isEditing} />
             </div>
 
             <div className="form-row">
-             
+              
               <div className="form-group-profile">
                 <label>Edad</label>
                 <input type="text" value={userData.edad ? `${userData.edad} años` : '--'} disabled={true} className="input-disabled"/>
               </div>
-             
+              
               <div className="form-group-profile">
                 <label>Género</label>
                 <input type="text" value={userData.genero} disabled={true} className="input-disabled"/>
@@ -192,7 +192,7 @@ const Perfil = () => {
             </div>
 
             <div className="form-row">
-              
+               
                <div className="form-group-profile">
                 <label>Peso (kg)</label>
                 <input type="number" name="peso" value={userData.peso} onChange={handleChange} disabled={!isEditing} />

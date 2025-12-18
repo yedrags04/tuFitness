@@ -11,7 +11,7 @@ const Rutinas = () => {
   const [modalMode, setModalMode] = useState('create'); 
   const navigate = useNavigate();
 
- 
+  // Estado inicial
   const initialRoutineState = {
     name: '',
     dayCount: 1,
@@ -28,7 +28,7 @@ const Rutinas = () => {
 
   const [newRoutine, setNewRoutine] = useState(initialRoutineState);
 
- 
+  // --- API: Cargar Rutinas ---
   const fetchRoutines = async () => {
     const token = localStorage.getItem('token');
     if (!token) return navigate('/iniciar-sesion');
@@ -49,18 +49,19 @@ const Rutinas = () => {
     fetchRoutines();
   }, [navigate]);
 
-
+  // --- HELPER: Extraer número seguro del día ---
+  // Convierte "1", "Dia 1", "Lunes", etc., en un número válido.
   const extraerNumeroDia = (valor) => {
     if (!valor) return 1;
     if (typeof valor === 'number') return valor;
     
-
+    // 1. Intentar convertir número directo ("1" -> 1)
     const parsed = parseInt(valor);
     if (!isNaN(parsed)) return parsed;
 
     const valStr = String(valor).toLowerCase().trim();
 
-
+    // 2. Mapeo de Días de la semana a números
     const diasSemana = {
         'lunes': 1, 'martes': 2, 'miércoles': 3, 'miercoles': 3, 
         'jueves': 4, 'viernes': 5, 'sábado': 6, 'sabado': 6, 'domingo': 7,
@@ -70,15 +71,15 @@ const Rutinas = () => {
 
     if (diasSemana[valStr]) return diasSemana[valStr];
 
-   
+    // 3. Buscar dígitos con Regex (ej: "Día 2" -> 2)
     const match = String(valor).match(/\d+/);
     if (match) return parseInt(match[0]);
 
-    
+    // Default
     return 1; 
   };
 
- 
+  // --- HELPER: Mapear BD -> Formulario ---
   const mapRoutineToForm = (routine) => {
     const currentExercises = routine.Exercises || routine.exercises || [];
     
@@ -86,14 +87,16 @@ const Rutinas = () => {
         return { ...initialRoutineState, name: routine.name || routine.nombre || '', duration: routine.duration || '' };
     }
 
-   
+    // 1. Calcular cuántos días tiene la rutina
     const maxDay = currentExercises.reduce((max, ex) => {
+        // Usamos la función blindada
         const diaNum = extraerNumeroDia(ex.dia || ex.day); 
         return Math.max(max, diaNum);
     }, 1);
     
     const reconstructedDays = [];
     for (let i = 1; i <= maxDay; i++) {
+        // 2. Filtrar ejercicios que pertenecen a este día 'i'
         const exercisesForDay = currentExercises
             .filter(ex => extraerNumeroDia(ex.dia || ex.day) === i)
             .map(ex => {
@@ -114,6 +117,7 @@ const Rutinas = () => {
                 };
             });
         
+        // Estructura mínima si el día está vacío
         const finalExercises = exercisesForDay.length > 0 
             ? exercisesForDay 
             : [{ name: '', series: [{ reps: '', weight: '' }] }];
@@ -127,11 +131,12 @@ const Rutinas = () => {
     return {
         name: routine.name || routine.nombre,
         duration: routine.duration || '',
-        dayCount: maxDay, 
+        dayCount: maxDay, // Ahora maxDay siempre será un número, nunca NaN
         daysData: reconstructedDays
     };
   };
 
+  // --- HANDLERS ---
   const openModal = (routine, mode) => {
     if (routine) {
         const formData = mapRoutineToForm(routine);
@@ -241,7 +246,7 @@ const Rutinas = () => {
             if(ex.name && ex.name.trim() !== '') {
                 formattedExercises.push({
                     name: ex.name,
-                    day: day.dayNumber, 
+                    day: day.dayNumber, // Enviamos el número limpio (1, 2, 3...)
                     series: ex.series 
                 });
             }
@@ -286,8 +291,10 @@ const Rutinas = () => {
       <div className="routines-grid">
         {misRutinas.length > 0 ? (
           misRutinas.map((routine) => {
+            // 🛑 CORRECCIÓN: Detectar si viene como 'Exercises' o 'exercises'
             const ejerciciosReales = routine.Exercises || routine.exercises || [];
             
+            // Calculamos los días únicos usando la lista correcta
             const numeroDeDias = ejerciciosReales.length > 0 
                 ? new Set(ejerciciosReales.map(e => extraerNumeroDia(e.dia || e.day))).size 
                 : 1;
@@ -297,6 +304,7 @@ const Rutinas = () => {
                 <h3>{routine.name || routine.nombre}</h3>
                 <p style={{fontSize:'0.9em', color:'#1d2122ff'}}>Duración: {routine.duration || 'N/A'}</p>
                 <div className="routine-tags">
+                   {/* Usamos la variable calculada arriba */}
                    <span className="tag-day">{numeroDeDias} Días</span>
                 </div>
                 <div className="routine-actions">
